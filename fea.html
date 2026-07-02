@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2D Structural FEA Tool — Dr. Ahmed Attia Drar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1f5; --panel:#ffffff; --border:#d6dbe2; --text:#22303e; --muted:#5d6b79;
+    --navy:#0e2238; --navy-3:#1b3f63; --gold:#c9a227; --gold-light:#e3c563;
+    --accent:#1b3f63; --danger:#c0392b;
+    --cN:#e74c3c; --cV:#1e9e50; --cM:#2471c8; --cDef:#b83fa0;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:"Inter",-apple-system,"Segoe UI",system-ui,Arial,sans-serif;color:var(--text);background:var(--bg);font-size:13px}
+  body{display:flex;flex-direction:column}
+  /* ===== Brand bar (matches main site) ===== */
+  #brandbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:var(--navy);color:#fff;padding:9px 18px;flex-shrink:0}
+  #brandbar .b-left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  #brandbar .b-title{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:16px;letter-spacing:.02em;color:#fff;text-decoration:none}
+  #brandbar .b-title span{color:var(--gold-light)}
+  #brandbar .b-sub{font-size:12px;color:#9fb1c2}
+  #brandbar a.b-back{color:var(--gold-light);text-decoration:none;font-size:12.5px;font-weight:600;
+    border:1px solid rgba(227,197,99,.5);padding:6px 16px;border-radius:999px;white-space:nowrap;transition:background .2s,color .2s}
+  #brandbar a.b-back:hover{background:var(--gold-light);color:var(--navy)}
+  /* ===== Brand watermark ===== */
+  #watermark{position:fixed;right:16px;bottom:44px;z-index:40;
+    font-family:"Inter",sans-serif;font-size:12px;font-weight:600;letter-spacing:.02em;
+    color:rgba(14,34,56,.5);background:rgba(255,255,255,.72);
+    padding:5px 12px;border-radius:999px;border:1px solid rgba(14,34,56,.12);
+    pointer-events:none;box-shadow:0 2px 8px rgba(14,34,56,.08)}
+  #watermark b{color:var(--gold);font-weight:700}
+  #toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px 8px;background:var(--panel);border-bottom:1px solid var(--border)}
+  .tgroup{display:flex;align-items:center;gap:3px;padding:0 8px;border-right:1px solid var(--border)}
+  .tgroup:last-child{border-right:none}
+  .glabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+  button{font:inherit;padding:5px 9px;border:1px solid var(--border);background:#fff;border-radius:5px;cursor:pointer;color:var(--text)}
+  button:hover{background:#eef2f8}
+  button.tool.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button.primary{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+  button.primary:hover{background:var(--gold-light);border-color:var(--gold-light)}
+  button.danger{background:#fff;color:var(--danger);border-color:var(--danger)}
+  select,input[type=number],input[type=text]{font:inherit;padding:4px 6px;border:1px solid var(--border);border-radius:5px;background:#fff;width:90px}
+  label.chk{display:flex;align-items:center;gap:3px;cursor:pointer;white-space:nowrap}
+  #main{flex:1;display:flex;min-height:0}
+  #sidebar{width:265px;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:10px;flex-shrink:0}
+  #sidebar h3{margin:12px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:3px}
+  #sidebar h3:first-child{margin-top:0}
+  .frow{display:flex;align-items:center;justify-content:space-between;margin:4px 0;gap:6px}
+  .frow label{flex:1}
+  .frow input,.frow select{width:110px}
+  #canvasWrap{flex:1;position:relative;min-width:0}
+  #cv{position:absolute;inset:0;width:100%;height:100%;display:block;background:#fdfdfe;cursor:crosshair}
+  #tooltip{position:absolute;pointer-events:none;background:rgba(28,32,40,.93);color:#fff;padding:7px 10px;border-radius:6px;font-size:12px;line-height:1.5;white-space:pre;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+  .hidden{display:none !important}
+  #statusbar{display:flex;gap:20px;padding:4px 12px;background:var(--panel);border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+  #modalBack{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:50}
+  #modal{background:#fff;border-radius:8px;padding:16px 18px;min-width:300px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+  #modal h3{margin:0 0 10px;font-size:15px}
+  #modalBody .frow input,#modalBody .frow select{width:130px}
+  #modalBtns{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+  .legend{display:flex;flex-direction:column;gap:3px;font-size:12px}
+  .legend span i{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:middle;border-radius:2px}
+  table.res{width:100%;border-collapse:collapse;font-size:11.5px}
+  table.res td,table.res th{border:1px solid var(--border);padding:2px 4px;text-align:right}
+  table.res th{background:#f0f3f7;text-align:center}
+  .tip{font-size:11.5px;color:var(--muted);line-height:1.45;margin:4px 0}
+  #hoverBox{font-size:12px;line-height:1.55;background:#f7f9fc;border:1px solid var(--border);border-radius:6px;padding:7px;min-height:60px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+
+<div id="brandbar">
+  <div class="b-left">
+    <a class="b-title" href="index.html">Ahmed&nbsp;Attia&nbsp;<span>DRAR</span></a>
+    <span class="b-sub">2D Structural FEA — Truss · Beam · Frame</span>
+  </div>
+  <a class="b-back" href="index.html">← Back to website</a>
+</div>
+
+<div id="watermark">Created by <b>Dr. Ahmed Attia</b></div>
+
+<header id="toolbar">
+  <div class="tgroup"><span class="glabel">File</span>
+    <button id="btnNew">New</button>
+    <select id="examples" style="width:130px">
+      <option value="">Examples…</option>
+      <option value="beam">Simply supported beam</option>
+      <option value="frame">Portal frame</option>
+      <option value="truss">Pratt truss</option>
+      <option value="arch">Curved arch</option>
+    </select>
+  </div>
+  <div class="tgroup"><span class="glabel">Edit</span>
+    <button id="btnUndo" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+    <button id="btnRedo" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" disabled>↷ Redo</button>
+  </div>
+  <div class="tgroup"><span class="glabel">Draw</span>
+    <button class="tool active" data-mode="select" title="Select / inspect (V)">⬚ Select</button>
+    <button class="tool" data-mode="node" title="Add node — clicking on an element splits it (N)">• Node</button>
+    <button class="tool" data-mode="elem" title="Draw line elements by clicking points (E)">／ Line</button>
+    <button class="tool" data-mode="curve" title="Draw a curve (start, control, end) — meshed into beam segments (C)">⌒ Curve</button>
+  </div>
+  <div class="tgroup"><span class="glabel">Supports</span>
+    <button class="tool" data-mode="pin" title="Pinned support (ux, uy fixed)">▲ Pin</button>
+    <button class="tool" data-mode="roller" title="Roller support (uy fixed)">◯ Roller</button>
+    <button class="tool" data-mode="fixed" title="Fixed support (ux, uy, rz fixed)">▣ Fixed</button>
+  </div>
+  <div class="tgroup"><span class="glabel">Loads</span>
+    <button class="tool" data-mode="pload" title="Point load at a node (Fx, Fy)">↓ Point</button>
+    <button class="tool" data-mode="mload" title="Concentrated moment at a node">↻ Moment</button>
+    <button class="tool" data-mode="dload" title="Distributed / trapezoidal load on an element">⫮ Distributed</button>
+    <button class="tool" data-mode="dispload" title="Prescribed displacement (support settlement) at a node">⇲ Displacement</button>
+  </div>
+  <div class="tgroup">
+    <button class="tool" data-mode="delete" title="Delete node or element">✕ Delete</button>
+  </div>
+  <div class="tgroup">
+    <button id="btnSolve" class="primary">▶ Solve</button>
+  </div>
+  <div class="tgroup"><span class="glabel">Results</span>
+    <label class="chk"><input type="checkbox" id="showR" checked>Reactions</label>
+    <label class="chk"><input type="checkbox" id="showN">N</label>
+    <label class="chk"><input type="checkbox" id="showV">V</label>
+    <label class="chk"><input type="checkbox" id="showM">M</label>
+    <label class="chk"><input type="checkbox" id="showDef" checked>Deformed</label>
+    <label class="chk"><input type="checkbox" id="showVals" checked>Values</label>
+  </div>
+  <div class="tgroup"><span class="glabel">Deform scale</span>
+    <input type="range" id="defScale" min="1" max="200" value="50" style="width:110px">
+    <span id="defScaleTxt" style="font-size:11px;color:var(--muted);min-width:55px"></span>
+  </div>
+</header>
+
+<div id="main">
+  <aside id="sidebar">
+    <h3>New element properties</h3>
+    <div class="frow"><label>Type</label>
+      <select id="pType"><option value="frame">Frame / Beam</option><option value="truss">Truss (axial only)</option></select></div>
+    <div class="frow"><label>E (GPa)</label><input type="number" id="pE" value="210" step="any"></div>
+    <div class="frow"><label>A (cm²)</label><input type="number" id="pA" value="100" step="any"></div>
+    <div class="frow"><label>I (cm⁴)</label><input type="number" id="pI" value="10000" step="any"></div>
+
+    <h3>Selected</h3>
+    <div id="selBox" class="tip">Nothing selected. Use the Select tool and click a node or element.</div>
+    <div id="selEdit" class="hidden">
+      <div class="frow"><label>Type</label>
+        <select id="sType"><option value="frame">Frame / Beam</option><option value="truss">Truss</option></select></div>
+      <div class="frow"><label>E (GPa)</label><input type="number" id="sE" step="any"></div>
+      <div class="frow"><label>A (cm²)</label><input type="number" id="sA" step="any"></div>
+      <div class="frow"><label>I (cm⁴)</label><input type="number" id="sI" step="any"></div>
+      <button id="btnApplySel" style="width:100%;margin-top:4px">Apply</button>
+    </div>
+
+    <h3>Pointer readout</h3>
+    <div id="hoverBox">Move the mouse over the structure after solving to read N, V, M and displacements at any point.</div>
+
+    <h3>Reactions</h3>
+    <div id="reactBox" class="tip">Solve to see support reactions.</div>
+
+    <h3>Legend</h3>
+    <div class="legend">
+      <span><i style="background:var(--cN)"></i>Axial force N (+ tension)</span>
+      <span><i style="background:var(--cV)"></i>Shear force V</span>
+      <span><i style="background:var(--cM)"></i>Bending moment M (drawn on tension side)</span>
+      <span><i style="background:var(--cDef)"></i>Deformed shape</span>
+    </div>
+
+    <h3>Notes</h3>
+    <div class="tip">
+      Units: kN, m (loads in kN, kN/m, kN·m — displacements shown in mm).<br>
+      Sign convention: +X right, +Y up, moments CCW+. Bending moment sagging-positive.<br>
+      Roller restrains vertical (Y) movement. Curves are meshed into straight Euler–Bernoulli beam segments.<br>
+      Pan: middle-drag or hold Space. Zoom: mouse wheel. Esc cancels drawing.
+    </div>
+  </aside>
+
+  <div id="canvasWrap">
+    <canvas id="cv"></canvas>
+    <div id="tooltip" class="hidden"></div>
+  </div>
+</div>
+
+<footer id="statusbar">
+  <span id="coords">x: 0.00, y: 0.00 m</span>
+  <span id="hint"></span>
+</footer>
+
+<div id="modalBack" class="hidden">
+  <div id="modal">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div id="modalBtns">
+      <button id="modalRemove" class="danger hidden">Remove</button>
+      <button id="modalCancel">Cancel</button>
+      <button id="modalOK" class="primary">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   2D Structural Finite Element Analysis — trusses, beams, frames
+   Euler–Bernoulli frame element (3 DOF/node: ux, uy, rz). Units kN, m.
+   ===================================================================== */
+
+// === SOLVER (DOM-free) ===
+function zeros(n){ return new Float64Array(n); }
+function matrix(n){ const A=[]; for(let i=0;i<n;i++) A.push(new Float64Array(n)); return A; }
+
+// Gaussian elimination with partial pivoting. Returns solution or null if singular.
+function solveLin(A,b){
+  const n=b.length, M=[], x=new Float64Array(n);
+  for(let i=0;i<n;i++){ M.push(Float64Array.from(A[i])); }
+  const rhs=Float64Array.from(b);
+  let scale=0; for(let i=0;i<n;i++) for(let j=0;j<n;j++) scale=Math.max(scale,Math.abs(M[i][j]));
+  if(scale===0) return null;
+  for(let k=0;k<n;k++){
+    let p=k,best=Math.abs(M[k][k]);
+    for(let i=k+1;i<n;i++){ const v=Math.abs(M[i][k]); if(v>best){best=v;p=i;} }
+    if(best<1e-12*scale) return null;
+    if(p!==k){ const t=M[p];M[p]=M[k];M[k]=t; const tb=rhs[p];rhs[p]=rhs[k];rhs[k]=tb; }
+    for(let i=k+1;i<n;i++){
+      const f=M[i][k]/M[k][k]; if(f===0) continue;
+      for(let j=k;j<n;j++) M[i][j]-=f*M[k][j];
+      rhs[i]-=f*rhs[k];
+    }
+  }
+  for(let i=n-1;i>=0;i--){
+    let s=rhs[i];
+    for(let j=i+1;j<n;j++) s-=M[i][j]*x[j];
+    x[i]=s/M[i][i];
+  }
+  return x;
+}
+
+function localK(el,L){
+  const E=el.E, A=el.A, I=el.I;
+  const a=E*A/L;
+  const k=matrix(6);
+  k[0][0]=a; k[0][3]=-a; k[3][0]=-a; k[3][3]=a;
+  if(el.type==='frame'){
+    const b=12*E*I/(L*L*L), c=6*E*I/(L*L), d=4*E*I/L, e=2*E*I/L;
+    k[1][1]=b; k[1][2]=c; k[1][4]=-b; k[1][5]=c;
+    k[2][1]=c; k[2][2]=d; k[2][4]=-c; k[2][5]=e;
+    k[4][1]=-b;k[4][2]=-c;k[4][4]=b;  k[4][5]=-c;
+    k[5][1]=c; k[5][2]=e; k[5][4]=-c; k[5][5]=d;
+  }
+  return k;
+}
+
+function transMat(c,s){ // u_local = T * u_global
+  const T=matrix(6);
+  T[0][0]=c; T[0][1]=s; T[1][0]=-s; T[1][1]=c; T[2][2]=1;
+  T[3][3]=c; T[3][4]=s; T[4][3]=-s; T[4][4]=c; T[5][5]=1;
+  return T;
+}
+function mul6(A,B){ const C=matrix(6);
+  for(let i=0;i<6;i++)for(let k=0;k<6;k++){const a=A[i][k]; if(a===0)continue;
+    for(let j=0;j<6;j++) C[i][j]+=a*B[k][j]; } return C; }
+function tr6(A){ const C=matrix(6); for(let i=0;i<6;i++)for(let j=0;j<6;j++)C[i][j]=A[j][i]; return C; }
+function mv6(A,v){ const r=new Float64Array(6);
+  for(let i=0;i<6;i++){let s=0;for(let j=0;j<6;j++)s+=A[i][j]*v[j]; r[i]=s;} return r; }
+
+// Resolve a distributed load (dir: 'globalY' | 'globalX' | 'localY', intensities w1->w2
+// per unit member length) into local trapezoids px (axial) and wy (transverse).
+function resolveDist(dist,c,s){
+  if(!dist) return {px1:0,px2:0,wy1:0,wy2:0};
+  let px1=0,px2=0,wy1=0,wy2=0;
+  if(dist.dir==='localY'){ wy1=dist.w1; wy2=dist.w2; }
+  else if(dist.dir==='globalY'){ px1=dist.w1*s; px2=dist.w2*s; wy1=dist.w1*c; wy2=dist.w2*c; }
+  else if(dist.dir==='globalX'){ px1=dist.w1*c; px2=dist.w2*c; wy1=-dist.w1*s; wy2=-dist.w2*s; }
+  return {px1,px2,wy1,wy2};
+}
+
+// Consistent equivalent nodal load vector (local) for trapezoidal member load.
+function localFeq(L,ld){
+  const f=new Float64Array(6);
+  // axial: linear p(x) from px1 to px2
+  f[0]=L*(2*ld.px1+ld.px2)/6;
+  f[3]=L*(ld.px1+2*ld.px2)/6;
+  // transverse: uniform wy1 + triangular (wy2-wy1) peaking at node 2
+  const wu=ld.wy1, wt=ld.wy2-ld.wy1;
+  f[1]=wu*L/2 + 3*wt*L/20;
+  f[2]=wu*L*L/12 + wt*L*L/30;
+  f[4]=wu*L/2 + 7*wt*L/20;
+  f[5]=-wu*L*L/12 - wt*L*L/20;
+  return f;
+}
+
+const NSAMP=41; // samples per element for diagrams / hover
+
+function runSolve(nodes, elements){
+  if(nodes.length<2 || elements.length<1) return {error:"Add at least one element before solving."};
+  const idx={}; nodes.forEach((n,i)=>idx[n.id]=i);
+  const ndof=nodes.length*3;
+  const K=matrix(ndof), F=zeros(ndof);
+
+  // nodal loads
+  for(const n of nodes){
+    const i=idx[n.id]*3;
+    if(n.load){ F[i]+=n.load.fx||0; F[i+1]+=n.load.fy||0; F[i+2]+=n.load.m||0; }
+  }
+
+  // assemble elements
+  const cache=[];
+  for(const el of elements){
+    const n1=nodes[idx[el.n1]], n2=nodes[idx[el.n2]];
+    const dx=n2.x-n1.x, dy=n2.y-n1.y, L=Math.hypot(dx,dy);
+    if(L<1e-9) return {error:"Element "+el.id+" has zero length."};
+    const c=dx/L, s=dy/L;
+    if(el.type==='truss' && el.dist) return {error:"Element "+el.id+" is a truss member — distributed loads are only supported on frame/beam elements. Change its type or apply nodal loads."};
+    const kl=localK(el,L), T=transMat(c,s), Tt=tr6(T);
+    const kg=mul6(Tt,mul6(kl,T));
+    const ld=resolveDist(el.dist,c,s);
+    const feqL=localFeq(L,ld);
+    const feqG=mv6(Tt,feqL);
+    const dofs=[idx[el.n1]*3,idx[el.n1]*3+1,idx[el.n1]*3+2,idx[el.n2]*3,idx[el.n2]*3+1,idx[el.n2]*3+2];
+    for(let i=0;i<6;i++){
+      F[dofs[i]]+=feqG[i];
+      for(let j=0;j<6;j++) K[dofs[i]][dofs[j]]+=kg[i][j];
+    }
+    cache.push({el,n1,n2,L,c,s,kl,T,feqL,ld,dofs});
+  }
+
+  // constraints: dof index -> prescribed value
+  const cons=new Map();
+  for(const n of nodes){
+    const i=idx[n.id]*3;
+    if(n.support==='pin'){ cons.set(i,0); cons.set(i+1,0); }
+    else if(n.support==='roller'){ cons.set(i+1,0); }
+    else if(n.support==='fixed'){ cons.set(i,0); cons.set(i+1,0); cons.set(i+2,0); }
+    if(n.disp){ // prescribed displacement loading overrides/adds (values in m, rad)
+      if(n.disp.dx!=null) cons.set(i,n.disp.dx);
+      if(n.disp.dy!=null) cons.set(i+1,n.disp.dy);
+      if(n.disp.rz!=null) cons.set(i+2,n.disp.rz);
+    }
+  }
+  // auto-constrain zero-stiffness DOFs (e.g. rotations of pure truss nodes)
+  let maxDiag=0; for(let i=0;i<ndof;i++) maxDiag=Math.max(maxDiag,Math.abs(K[i][i]));
+  for(let i=0;i<ndof;i++) if(!cons.has(i) && Math.abs(K[i][i])<1e-8*maxDiag) cons.set(i,0);
+  if(cons.size===0) return {error:"No supports defined. Add pin / roller / fixed supports first."};
+
+  const free=[]; for(let i=0;i<ndof;i++) if(!cons.has(i)) free.push(i);
+  const nf=free.length;
+  const u=zeros(ndof);
+  cons.forEach((v,d)=>u[d]=v);
+  let uf=null;
+  if(nf>0){
+    const Kff=[]; const rhs=new Float64Array(nf);
+    for(let a=0;a<nf;a++){
+      const row=new Float64Array(nf);
+      const i=free[a];
+      let r=F[i];
+      cons.forEach((v,d)=>{ if(v!==0) r-=K[i][d]*v; });
+      for(let b=0;b<nf;b++) row[b]=K[i][free[b]];
+      Kff.push(row); rhs[a]=r;
+    }
+    uf=solveLin(Kff,rhs);
+    if(!uf) return {error:"Structure is unstable (singular stiffness matrix). Check supports and connectivity."};
+    for(let a=0;a<nf;a++) u[free[a]]=uf[a];
+  }
+
+  // reactions at constrained DOFs: R = K·u − F
+  const reactions={};
+  cons.forEach((v,d)=>{
+    let s2=0; for(let j=0;j<ndof;j++) s2+=K[d][j]*u[j];
+    const R=s2-F[d];
+    const ni=Math.floor(d/3), comp=d%3;
+    const nid=nodes[ni].id;
+    if(!reactions[nid]) reactions[nid]={rx:null,ry:null,mz:null};
+    reactions[nid][comp===0?'rx':comp===1?'ry':'mz']=R;
+  });
+
+  // per-element internal forces & deflections
+  const elems={};
+  let maxN=0,maxV=0,maxM=0,maxDisp=0;
+  for(const ec of cache){
+    const ue=new Float64Array(6);
+    for(let i=0;i<6;i++) ue[i]=u[ec.dofs[i]];
+    const ul=mv6(ec.T,ue);
+    const fn=mv6(ec.kl,ul);            // k·u
+    for(let i=0;i<6;i++) fn[i]-=ec.feqL[i]; // minus equivalent loads -> true end forces on element
+    const L=ec.L, c=ec.c, s=ec.s;
+    const {px1,px2,wy1,wy2}=ec.ld;
+    const F1x=fn[0],F1y=fn[1],M1=fn[2];
+
+    // particular deflection (fixed-fixed) for transverse member load, numeric 4x integration
+    const m=NSAMP-1, h=L/m;
+    let vp=null;
+    if(ec.el.type==='frame' && ec.el.I>0 && (wy1!==0||wy2!==0)){
+      const g1=new Float64Array(NSAMP),g2=new Float64Array(NSAMP),g3=new Float64Array(NSAMP),g4=new Float64Array(NSAMP);
+      const w=(x)=>wy1+(wy2-wy1)*x/L;
+      for(let i=1;i<NSAMP;i++){
+        const x0=(i-1)*h,x1=i*h;
+        g1[i]=g1[i-1]+h*(w(x0)+w(x1))/2;
+        g2[i]=g2[i-1]+h*(g1[i-1]+g1[i])/2;
+        g3[i]=g3[i-1]+h*(g2[i-1]+g2[i])/2;
+        g4[i]=g4[i-1]+h*(g3[i-1]+g3[i])/2;
+      }
+      // add a x^3 + b x^2 so that v(L)=v'(L)=0  (v(0)=v'(0)=0 already)
+      const gL=g4[m], gpL=g3[m];
+      const det=(L*L*L)*(2*L)-(L*L)*(3*L*L);
+      const a=((-gL)*(2*L)-(L*L)*(-gpL))/det;
+      const b=((L*L*L)*(-gpL)-(-gL)*(3*L*L))/det;
+      const EI=ec.el.E*ec.el.I;
+      vp=new Float64Array(NSAMP);
+      for(let i=0;i<NSAMP;i++){ const x=i*h; vp[i]=(g4[i]+a*x*x*x+b*x*x)/EI; }
+    }
+
+    const xs=new Float64Array(NSAMP),N=new Float64Array(NSAMP),V=new Float64Array(NSAMP),M=new Float64Array(NSAMP);
+    const gdx=new Float64Array(NSAMP),gdy=new Float64Array(NSAMP);
+    for(let i=0;i<NSAMP;i++){
+      const x=i*h, xi=x/L;
+      xs[i]=x;
+      N[i]=-(F1x + px1*x + (px2-px1)*x*x/(2*L));
+      V[i]= F1y + wy1*x + (wy2-wy1)*x*x/(2*L);
+      M[i]=-M1 + F1y*x + wy1*x*x/2 + (wy2-wy1)*x*x*x/(6*L);
+      // local displacements
+      const uax=ul[0]*(1-xi)+ul[3]*xi;
+      let vtr;
+      if(ec.el.type==='truss'){ vtr=ul[1]*(1-xi)+ul[4]*xi; }
+      else{
+        const H1=1-3*xi*xi+2*xi*xi*xi, H2=L*(xi-2*xi*xi+xi*xi*xi),
+              H3=3*xi*xi-2*xi*xi*xi,   H4=L*(-xi*xi+xi*xi*xi);
+        vtr=H1*ul[1]+H2*ul[2]+H3*ul[4]+H4*ul[5];
+        if(vp) vtr+=vp[i];
+      }
+      gdx[i]=c*uax - s*vtr;
+      gdy[i]=s*uax + c*vtr;
+      maxN=Math.max(maxN,Math.abs(N[i])); maxV=Math.max(maxV,Math.abs(V[i])); maxM=Math.max(maxM,Math.abs(M[i]));
+      maxDisp=Math.max(maxDisp,Math.hypot(gdx[i],gdy[i]));
+    }
+    if(ec.el.type==='truss'){ for(let i=0;i<NSAMP;i++){V[i]=0;M[i]=0;} }
+    elems[ec.el.id]={L,c,s,x1:ec.n1.x,y1:ec.n1.y,xs,N,V,M,gdx,gdy};
+  }
+
+  return {u, idx, reactions, elems, maxN, maxV, maxM, maxDisp};
+}
+// === END SOLVER ===
+
+/* ============================ UI / APP ============================ */
+const state={ nodes:[], elements:[], nextN:1, nextE:1, results:null };
+const view={ cx:5, cy:2, scale:80 }; // world center & px per meter
+let mode='select';
+let mouse={sx:0,sy:0,wx:0,wy:0,inCanvas:false};
+let chain=null;        // last node id while drawing line elements
+let curvePts=[];       // clicked points for curve tool
+let selection=null;    // {type:'node'|'elem', id}
+let panning=null, spaceDown=false;
+
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const tooltip=document.getElementById('tooltip');
+const GRID=0.5;
+
+function W2S(x,y){ const r=cv.getBoundingClientRect();
+  return {x:(x-view.cx)*view.scale + r.width/2, y:r.height/2 - (y-view.cy)*view.scale}; }
+function S2W(sx,sy){ const r=cv.getBoundingClientRect();
+  return {x:view.cx + (sx-r.width/2)/view.scale, y:view.cy + (r.height/2-sy)/view.scale}; }
+
+function fmt(v,d){ if(!isFinite(v))return"—"; if(Math.abs(v)<1e-9)v=0;
+  const a=Math.abs(v); const dec = d!=null?d : (a>=100?1:a>=10?2:3);
+  return v.toFixed(dec); }
+
+function invalidate(){ state.results=null; updateReactBox(); }
+function nodeById(id){ return state.nodes.find(n=>n.id===id); }
+function elemById(id){ return state.elements.find(e=>e.id===id); }
+
+/* ---------- geometry helpers ---------- */
+function nodeAtScreen(sx,sy,tol){ tol=tol||10;
+  let best=null,bd=tol;
+  for(const n of state.nodes){ const p=W2S(n.x,n.y); const d=Math.hypot(p.x-sx,p.y-sy);
+    if(d<bd){bd=d;best=n;} } return best; }
+function elemAtScreen(sx,sy,tol){ tol=tol||8;
+  let best=null,bd=tol,bt=0;
+  for(const e of state.elements){
+    const a=nodeById(e.n1),b=nodeById(e.n2);
+    const p1=W2S(a.x,a.y),p2=W2S(b.x,b.y);
+    const vx=p2.x-p1.x,vy=p2.y-p1.y,len2=vx*vx+vy*vy; if(len2<1e-9)continue;
+    let t=((sx-p1.x)*vx+(sy-p1.y)*vy)/len2; t=Math.max(0,Math.min(1,t));
+    const d=Math.hypot(p1.x+t*vx-sx,p1.y+t*vy-sy);
+    if(d<bd){bd=d;best=e;bt=t;}
+  }
+  return best?{elem:best,t:bt}:null; }
+
+function snapPoint(wx,wy){
+  // node snap first (12 px)
+  const p=W2S(wx,wy); const n=nodeAtScreen(p.x,p.y,12);
+  if(n) return {x:n.x,y:n.y,node:n};
+  return {x:Math.round(wx/GRID)*GRID, y:Math.round(wy/GRID)*GRID, node:null};
+}
+
+function defaults(){
+  return { type:document.getElementById('pType').value,
+    E:(parseFloat(document.getElementById('pE').value)||210)*1e6,   // GPa -> kN/m²
+    A:(parseFloat(document.getElementById('pA').value)||100)*1e-4,  // cm² -> m²
+    I:(parseFloat(document.getElementById('pI').value)||10000)*1e-8 // cm⁴ -> m⁴
+  };
+}
+
+function addNode(x,y){
+  for(const n of state.nodes) if(Math.hypot(n.x-x,n.y-y)<1e-6) return n;
+  const n={id:state.nextN++,x,y,support:null,load:null,disp:null};
+  state.nodes.push(n);
+  // split an element if the node lies on it
+  for(const e of state.elements.slice()){
+    const a=nodeById(e.n1),b=nodeById(e.n2);
+    if(a===n||b===n) continue;
+    const vx=b.x-a.x,vy=b.y-a.y,L2=vx*vx+vy*vy; if(L2<1e-12)continue;
+    const t=((x-a.x)*vx+(y-a.y)*vy)/L2;
+    if(t<=1e-6||t>=1-1e-6) continue;
+    const px=a.x+t*vx,py=a.y+t*vy;
+    if(Math.hypot(px-x,py-y)<1e-6){ splitElement(e,n,t); }
+  }
+  invalidate(); return n;
+}
+function splitElement(e,n,t){
+  const wMid = e.dist ? e.dist.w1+(e.dist.w2-e.dist.w1)*t : 0;
+  const e1={id:state.nextE++,n1:e.n1,n2:n.id,type:e.type,E:e.E,A:e.A,I:e.I,
+            dist:e.dist?{dir:e.dist.dir,w1:e.dist.w1,w2:wMid}:null};
+  const e2={id:state.nextE++,n1:n.id,n2:e.n2,type:e.type,E:e.E,A:e.A,I:e.I,
+            dist:e.dist?{dir:e.dist.dir,w1:wMid,w2:e.dist.w2}:null};
+  state.elements.splice(state.elements.indexOf(e),1,e1,e2);
+}
+function addElement(n1,n2,props){
+  if(n1===n2) return null;
+  for(const e of state.elements)
+    if((e.n1===n1&&e.n2===n2)||(e.n1===n2&&e.n2===n1)) return e;
+  const p=props||defaults();
+  const e={id:state.nextE++,n1,n2,type:p.type,E:p.E,A:p.A,I:p.I,dist:null};
+  state.elements.push(e); invalidate(); return e;
+}
+function deleteNode(n){
+  state.elements=state.elements.filter(e=>e.n1!==n.id&&e.n2!==n.id);
+  state.nodes.splice(state.nodes.indexOf(n),1); invalidate();
+}
+function deleteElement(e){ state.elements.splice(state.elements.indexOf(e),1); invalidate(); }
+
+/* ---------- history: undo / redo ---------- */
+const history={ stack:[], idx:-1 };
+let lastCommitted=null;
+function snapshot(){ return JSON.stringify({nodes:state.nodes,elements:state.elements,nextN:state.nextN,nextE:state.nextE}); }
+function restoreSnap(s){ const o=JSON.parse(s);
+  state.nodes=o.nodes; state.elements=o.elements; state.nextN=o.nextN; state.nextE=o.nextE;
+  state.results=null; selection=null; chain=null; curvePts=[]; }
+function commit(){
+  const snap=snapshot(); if(snap===lastCommitted) return;
+  history.stack=history.stack.slice(0,history.idx+1);
+  history.stack.push(snap); history.idx=history.stack.length-1;
+  if(history.stack.length>150){ history.stack.shift(); history.idx--; }
+  lastCommitted=snap; updateUndoButtons();
+}
+function applyHistory(){ invalidate(); updateSelBox(); updateReactBox(); draw(); updateUndoButtons(); }
+function undo(){ if(history.idx>0){ history.idx--; lastCommitted=history.stack[history.idx]; restoreSnap(lastCommitted); applyHistory(); } }
+function redo(){ if(history.idx<history.stack.length-1){ history.idx++; lastCommitted=history.stack[history.idx]; restoreSnap(lastCommitted); applyHistory(); } }
+function updateUndoButtons(){
+  const u=document.getElementById('btnUndo'), r=document.getElementById('btnRedo');
+  if(u) u.disabled=history.idx<=0;
+  if(r) r.disabled=history.idx>=history.stack.length-1;
+}
+
+function modelSize(){
+  if(state.nodes.length<2) return 10;
+  let x0=1/0,x1=-1/0,y0=1/0,y1=-1/0;
+  for(const n of state.nodes){x0=Math.min(x0,n.x);x1=Math.max(x1,n.x);y0=Math.min(y0,n.y);y1=Math.max(y1,n.y);}
+  return Math.max(1,Math.hypot(x1-x0,y1-y0));
+}
+
+/* ---------- modal forms ---------- */
+function openForm(title,fields,onOK,onRemove){
+  const back=document.getElementById('modalBack'), body=document.getElementById('modalBody');
+  document.getElementById('modalTitle').textContent=title;
+  body.innerHTML='';
+  for(const f of fields){
+    const row=document.createElement('div'); row.className='frow';
+    const lab=document.createElement('label'); lab.textContent=f.label; row.appendChild(lab);
+    let inp;
+    if(f.type==='select'){ inp=document.createElement('select');
+      for(const o of f.options){const op=document.createElement('option');op.value=o.v;op.textContent=o.t;inp.appendChild(op);}
+      inp.value=f.value;
+    } else { inp=document.createElement('input'); inp.type='text'; inp.value=f.value==null?'':f.value;
+      inp.placeholder=f.placeholder||''; }
+    inp.id='mf_'+f.key; row.appendChild(inp); body.appendChild(row);
+  }
+  const rm=document.getElementById('modalRemove');
+  rm.classList.toggle('hidden',!onRemove);
+  back.classList.remove('hidden');
+  const ok=document.getElementById('modalOK'), cancel=document.getElementById('modalCancel');
+  const close=()=>{ back.classList.add('hidden'); ok.onclick=cancel.onclick=rm.onclick=null; };
+  ok.onclick=()=>{ const vals={};
+    for(const f of fields){ const el=document.getElementById('mf_'+f.key);
+      vals[f.key]= f.type==='select'? el.value : el.value.trim(); }
+    close(); onOK(vals); commit(); };
+  cancel.onclick=close;
+  if(onRemove) rm.onclick=()=>{ close(); onRemove(); commit(); };
+  const first=body.querySelector('input,select'); if(first) first.focus();
+}
+const num=(s)=>{ if(s===''||s==null) return null; const v=parseFloat(s); return isFinite(v)?v:null; };
+
+/* ---------- click handling per mode ---------- */
+function handleClick(wx,wy,sx,sy){
+  if(mode==='select'){
+    const n=nodeAtScreen(sx,sy);
+    if(n){ selection={type:'node',id:n.id}; updateSelBox(); draw(); return; }
+    const eh=elemAtScreen(sx,sy);
+    selection = eh?{type:'elem',id:eh.elem.id}:null;
+    updateSelBox(); draw(); return;
+  }
+  if(mode==='node'){ const s=snapPoint(wx,wy); addNode(s.x,s.y); draw(); return; }
+  if(mode==='elem'){
+    const s=snapPoint(wx,wy); const n=addNode(s.x,s.y);
+    if(chain==null){ chain=n.id; }
+    else { addElement(chain,n.id); chain=n.id; }
+    draw(); return;
+  }
+  if(mode==='curve'){
+    const s=snapPoint(wx,wy); curvePts.push({x:s.x,y:s.y});
+    if(curvePts.length===3){
+      const [P0,P1,P2]=curvePts; curvePts=[];
+      const nseg=8; let prev=addNode(P0.x,P0.y);
+      for(let i=1;i<=nseg;i++){
+        const t=i/nseg, mt=1-t;
+        const x=mt*mt*P0.x+2*mt*t*P1.x+t*t*P2.x;
+        const y=mt*mt*P0.y+2*mt*t*P1.y+t*t*P2.y;
+        const nn=addNode(Math.round(x*1000)/1000,Math.round(y*1000)/1000);
+        addElement(prev.id,nn.id); prev=nn;
+      }
+    }
+    draw(); return;
+  }
+  if(mode==='pin'||mode==='roller'||mode==='fixed'){
+    const n=nodeAtScreen(sx,sy);
+    if(n){ n.support = (n.support===mode)?null:mode; invalidate(); draw(); }
+    return;
+  }
+  if(mode==='pload'){
+    const n=nodeAtScreen(sx,sy); if(!n) return;
+    const cur=n.load||{};
+    openForm('Point load at node '+n.id,[
+      {key:'fx',label:'Fx (kN, +→)',value:cur.fx||0},
+      {key:'fy',label:'Fy (kN, +↑)',value:cur.fy||0}],
+      v=>{ const fx=num(v.fx)||0, fy=num(v.fy)||0;
+        n.load=Object.assign({},n.load,{fx,fy}); if(!n.load.m)n.load.m=0;
+        if(!fx&&!fy&&!n.load.m)n.load=null; invalidate(); draw(); },
+      (n.load&&(n.load.fx||n.load.fy))?()=>{ if(n.load){n.load.fx=0;n.load.fy=0; if(!n.load.m)n.load=null;} invalidate(); draw(); }:null);
+    return;
+  }
+  if(mode==='mload'){
+    const n=nodeAtScreen(sx,sy); if(!n) return;
+    const cur=n.load||{};
+    openForm('Moment at node '+n.id,[
+      {key:'m',label:'M (kN·m, CCW+)',value:cur.m||0}],
+      v=>{ const m=num(v.m)||0;
+        n.load=Object.assign({fx:0,fy:0},n.load,{m});
+        if(!n.load.fx&&!n.load.fy&&!m)n.load=null; invalidate(); draw(); },
+      (cur.m)?()=>{ n.load.m=0; if(!n.load.fx&&!n.load.fy)n.load=null; invalidate(); draw(); }:null);
+    return;
+  }
+  if(mode==='dload'){
+    const eh=elemAtScreen(sx,sy); if(!eh) return;
+    const e=eh.elem, cur=e.dist||{dir:'globalY',w1:-10,w2:-10};
+    openForm('Distributed load on element '+e.id+' (per m of member)',[
+      {key:'dir',label:'Direction',type:'select',value:cur.dir,options:[
+        {v:'globalY',t:'Global Y (+↑)'},{v:'globalX',t:'Global X (+→)'},{v:'localY',t:'Local ⊥ to member'}]},
+      {key:'w1',label:'w₁ at start (kN/m)',value:cur.w1},
+      {key:'w2',label:'w₂ at end (kN/m)',value:cur.w2}],
+      v=>{ const w1=num(v.w1)||0,w2=num(v.w2)||0;
+        e.dist=(w1||w2)?{dir:v.dir,w1,w2}:null; invalidate(); draw(); },
+      e.dist?()=>{ e.dist=null; invalidate(); draw(); }:null);
+    return;
+  }
+  if(mode==='dispload'){
+    const n=nodeAtScreen(sx,sy); if(!n) return;
+    const cur=n.disp||{};
+    openForm('Prescribed displacement at node '+n.id+' (blank = free)',[
+      {key:'dx',label:'δx (mm)',value:cur.dx!=null?cur.dx*1000:'',placeholder:'free'},
+      {key:'dy',label:'δy (mm)',value:cur.dy!=null?cur.dy*1000:'',placeholder:'free'},
+      {key:'rz',label:'θz (rad)',value:cur.rz!=null?cur.rz:'',placeholder:'free'}],
+      v=>{ const dx=num(v.dx),dy=num(v.dy),rz=num(v.rz);
+        n.disp=(dx!=null||dy!=null||rz!=null)?{dx:dx!=null?dx/1000:null,dy:dy!=null?dy/1000:null,rz}:null;
+        invalidate(); draw(); },
+      n.disp?()=>{ n.disp=null; invalidate(); draw(); }:null);
+    return;
+  }
+  if(mode==='delete'){
+    const n=nodeAtScreen(sx,sy);
+    if(n){ deleteNode(n); selection=null; updateSelBox(); draw(); return; }
+    const eh=elemAtScreen(sx,sy);
+    if(eh){ deleteElement(eh.elem); selection=null; updateSelBox(); draw(); }
+    return;
+  }
+}
+
+/* ---------- sidebar: selection ---------- */
+function updateSelBox(){
+  const box=document.getElementById('selBox'), ed=document.getElementById('selEdit');
+  ed.classList.add('hidden');
+  if(!selection){ box.textContent='Nothing selected. Use the Select tool and click a node or element.'; return; }
+  if(selection.type==='node'){
+    const n=nodeById(selection.id); if(!n){selection=null;return updateSelBox();}
+    let t='Node '+n.id+'  ('+fmt(n.x,2)+', '+fmt(n.y,2)+') m\nSupport: '+(n.support||'—');
+    if(n.load) t+='\nLoad: Fx='+fmt(n.load.fx||0)+' Fy='+fmt(n.load.fy||0)+' kN, M='+fmt(n.load.m||0)+' kN·m';
+    if(n.disp) t+='\nPrescribed: δx='+(n.disp.dx!=null?fmt(n.disp.dx*1000)+'mm':'free')+
+      ' δy='+(n.disp.dy!=null?fmt(n.disp.dy*1000)+'mm':'free')+' θ='+(n.disp.rz!=null?n.disp.rz:'free');
+    if(state.results){
+      const i=state.results.idx[n.id]*3, u=state.results.u;
+      t+='\nδx='+fmt(u[i]*1000)+' mm, δy='+fmt(u[i+1]*1000)+' mm, θ='+u[i+2].toExponential(3)+' rad';
+      const R=state.results.reactions[n.id];
+      if(R) t+='\nReactions: '+(R.rx!=null?'Rx='+fmt(R.rx)+' kN ':'')+(R.ry!=null?'Ry='+fmt(R.ry)+' kN ':'')+(R.mz!=null?'Mz='+fmt(R.mz)+' kN·m':'');
+    }
+    box.textContent=t;
+  } else {
+    const e=elemById(selection.id); if(!e){selection=null;return updateSelBox();}
+    const a=nodeById(e.n1),b=nodeById(e.n2),L=Math.hypot(b.x-a.x,b.y-a.y);
+    box.textContent='Element '+e.id+'  ('+e.n1+' → '+e.n2+'), L='+fmt(L,3)+' m'+
+      (e.dist?'\nDist. load: '+e.dist.dir+' w₁='+e.dist.w1+' w₂='+e.dist.w2+' kN/m':'');
+    ed.classList.remove('hidden');
+    document.getElementById('sType').value=e.type;
+    document.getElementById('sE').value=e.E/1e6;
+    document.getElementById('sA').value=e.A/1e-4;
+    document.getElementById('sI').value=e.I/1e-8;
+  }
+}
+document.getElementById('btnApplySel').onclick=()=>{
+  if(!selection||selection.type!=='elem')return;
+  const e=elemById(selection.id); if(!e)return;
+  e.type=document.getElementById('sType').value;
+  e.E=(parseFloat(document.getElementById('sE').value)||210)*1e6;
+  e.A=(parseFloat(document.getElementById('sA').value)||100)*1e-4;
+  e.I=(parseFloat(document.getElementById('sI').value)||10000)*1e-8;
+  invalidate(); updateSelBox(); draw(); commit();
+};
+
+/* ---------- reactions table ---------- */
+function updateReactBox(){
+  const box=document.getElementById('reactBox');
+  if(!state.results){ box.textContent='Solve to see support reactions.'; return; }
+  const R=state.results.reactions; const ids=Object.keys(R);
+  if(!ids.length){ box.textContent='No supported nodes.'; return; }
+  let h='<table class="res"><tr><th>Node</th><th>Rx (kN)</th><th>Ry (kN)</th><th>Mz (kN·m)</th></tr>';
+  for(const id of ids){
+    const r=R[id];
+    h+='<tr><td style="text-align:center">'+id+'</td><td>'+(r.rx!=null?fmt(r.rx):'—')+
+       '</td><td>'+(r.ry!=null?fmt(r.ry):'—')+'</td><td>'+(r.mz!=null?fmt(r.mz):'—')+'</td></tr>';
+  }
+  h+='</table><div class="tip">Max displacement: '+(state.results.maxDisp?fmt(state.results.maxDisp*1000):'0')+
+     ' mm · |M|max '+fmt(state.results.maxM)+' kN·m · |V|max '+fmt(state.results.maxV)+' kN · |N|max '+fmt(state.results.maxN)+' kN</div>';
+  box.innerHTML=h;
+}
+
+/* ---------- drawing ---------- */
+function resize(){
+  const r=cv.parentElement.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  cv.width=r.width*dpr; cv.height=r.height*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+window.addEventListener('resize',resize);
+
+function draw(){
+  const r=cv.getBoundingClientRect();
+  ctx.clearRect(0,0,r.width,r.height);
+  drawGrid(r);
+  for(const e of state.elements) drawDistLoad(e);
+  for(const e of state.elements) drawElement(e);
+  if(state.results) drawDiagrams();
+  if(state.results && document.getElementById('showDef').checked) drawDeformed();
+  for(const n of state.nodes){ drawSupport(n); drawNodeLoads(n); }
+  if(state.results && document.getElementById('showR').checked) drawReactions();
+  for(const n of state.nodes) drawNode(n);
+  if(state.results && document.getElementById('showVals').checked) drawNodeDisp();
+  drawPreview();
+}
+
+function drawGrid(r){
+  const step=GRID*view.scale;
+  if(step>=8){
+    const tl=S2W(0,0), br=S2W(r.width,r.height);
+    ctx.strokeStyle='#eceff3'; ctx.lineWidth=1; ctx.beginPath();
+    for(let x=Math.ceil(tl.x/GRID)*GRID; x<=br.x; x+=GRID){ const p=W2S(x,0); ctx.moveTo(p.x,0); ctx.lineTo(p.x,r.height); }
+    for(let y=Math.ceil(br.y/GRID)*GRID; y<=tl.y; y+=GRID){ const p=W2S(0,y); ctx.moveTo(0,p.y); ctx.lineTo(r.width,p.y); }
+    ctx.stroke();
+    // meter gridlines darker
+    ctx.strokeStyle='#dde2e9'; ctx.beginPath();
+    for(let x=Math.ceil(tl.x); x<=br.x; x++){ const p=W2S(x,0); ctx.moveTo(p.x,0); ctx.lineTo(p.x,r.height); }
+    for(let y=Math.ceil(br.y); y<=tl.y; y++){ const p=W2S(0,y); ctx.moveTo(0,p.y); ctx.lineTo(r.width,p.y); }
+    ctx.stroke();
+  }
+  // axes
+  const o=W2S(0,0);
+  ctx.strokeStyle='#c2c9d4'; ctx.lineWidth=1.5; ctx.beginPath();
+  ctx.moveTo(o.x,0); ctx.lineTo(o.x,r.height); ctx.moveTo(0,o.y); ctx.lineTo(r.width,o.y); ctx.stroke();
+}
+
+function drawElement(e){
+  const a=nodeById(e.n1),b=nodeById(e.n2);
+  const p1=W2S(a.x,a.y),p2=W2S(b.x,b.y);
+  const sel=selection&&selection.type==='elem'&&selection.id===e.id;
+  ctx.strokeStyle=sel?'#e67e22':'#2c3e50';
+  ctx.lineWidth=e.type==='truss'?2:3.2;
+  if(e.type==='truss') ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+  if(e.type==='truss'){ // hinge circles near ends
+    ctx.fillStyle='#fff'; ctx.strokeStyle=sel?'#e67e22':'#2c3e50'; ctx.lineWidth=1.4;
+    for(const [p,q] of [[p1,p2],[p2,p1]]){
+      const d=Math.hypot(q.x-p.x,q.y-p.y)||1;
+      const hx=p.x+(q.x-p.x)/d*10, hy=p.y+(q.y-p.y)/d*10;
+      ctx.beginPath(); ctx.arc(hx,hy,3,0,7); ctx.fill(); ctx.stroke();
+    }
+  }
+}
+
+function arrow(x1,y1,x2,y2,color,w){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w||1.8;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const ang=Math.atan2(y2-y1,x2-x1), ah=7;
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-ah*Math.cos(ang-0.42),y2-ah*Math.sin(ang-0.42));
+  ctx.lineTo(x2-ah*Math.cos(ang+0.42),y2-ah*Math.sin(ang+0.42));
+  ctx.closePath(); ctx.fill();
+}
+function label(x,y,txt,color,align){
+  ctx.font='11px Segoe UI,Arial'; ctx.textAlign=align||'center'; ctx.textBaseline='middle';
+  ctx.lineWidth=3; ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.strokeText(txt,x,y);
+  ctx.fillStyle=color||'#333'; ctx.fillText(txt,x,y);
+}
+
+function drawNode(n){
+  const p=W2S(n.x,n.y);
+  const sel=selection&&selection.type==='node'&&selection.id===n.id;
+  ctx.fillStyle=sel?'#e67e22':'#1f2733';
+  ctx.beginPath(); ctx.arc(p.x,p.y,4,0,7); ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.stroke();
+}
+
+function drawSupport(n){
+  if(!n.support&&!n.disp) return;
+  const p=W2S(n.x,n.y); ctx.lineWidth=1.8;
+  if(n.support==='pin'||n.support==='roller'){
+    ctx.strokeStyle='#7a5c2e'; ctx.fillStyle='#d9b97f';
+    ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-9,p.y+14); ctx.lineTo(p.x+9,p.y+14); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    if(n.support==='roller'){
+      ctx.fillStyle='#7a5c2e';
+      ctx.beginPath(); ctx.arc(p.x-5,p.y+18,3,0,7); ctx.arc(p.x+5,p.y+18,3,0,7); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(p.x-11,p.y+22); ctx.lineTo(p.x+11,p.y+22); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(p.x-11,p.y+14); ctx.lineTo(p.x+11,p.y+14); ctx.stroke();
+      for(let i=-8;i<=8;i+=4){ ctx.beginPath(); ctx.moveTo(p.x+i,p.y+14); ctx.lineTo(p.x+i-4,p.y+20); ctx.stroke(); }
+    }
+  } else if(n.support==='fixed'){
+    ctx.strokeStyle='#7a5c2e';
+    // hatched block oriented down by default
+    ctx.beginPath(); ctx.moveTo(p.x-12,p.y); ctx.lineTo(p.x+12,p.y); ctx.stroke();
+    for(let i=-10;i<=10;i+=4){ ctx.beginPath(); ctx.moveTo(p.x+i,p.y); ctx.lineTo(p.x+i-5,p.y+8); ctx.stroke(); }
+  }
+  if(n.disp){
+    const txt='Δ('+(n.disp.dx!=null?fmt(n.disp.dx*1000,1):'·')+','+(n.disp.dy!=null?fmt(n.disp.dy*1000,1):'·')+')mm';
+    label(p.x+4,p.y-26,txt,'#d35400','left');
+    arrow(p.x,p.y-22,p.x,p.y-8,'#d35400',1.6);
+  }
+}
+
+function drawNodeLoads(n){
+  if(!n.load) return;
+  const p=W2S(n.x,n.y);
+  const fx=n.load.fx||0, fy=n.load.fy||0, m=n.load.m||0;
+  if(fx||fy){
+    const mag=Math.hypot(fx,fy), len=42;
+    const ux=fx/mag, uy=-fy/mag; // screen dir
+    arrow(p.x-ux*len,p.y-uy*len,p.x-ux*6,p.y-uy*6,'#c0392b',2);
+    label(p.x-ux*len-uy*10,p.y-uy*len+ux*10,fmt(mag,1)+' kN','#c0392b');
+  }
+  if(m){
+    ctx.strokeStyle='#8e44ad'; ctx.lineWidth=2;
+    ctx.beginPath();
+    if(m>0) ctx.arc(p.x,p.y,14,0.4,4.6); else ctx.arc(p.x,p.y,14,4.6,0.4);
+    ctx.stroke();
+    const aEnd=m>0?4.6:0.4, hx=p.x+14*Math.cos(aEnd), hy=p.y+14*Math.sin(aEnd);
+    const tang=aEnd+(m>0?Math.PI/2:-Math.PI/2);
+    arrow(hx-6*Math.cos(tang),hy-6*Math.sin(tang),hx,hy,'#8e44ad',2);
+    label(p.x+20,p.y-16,fmt(m,1)+' kN·m','#8e44ad','left');
+  }
+}
+
+function drawDistLoad(e){
+  if(!e.dist) return;
+  const a=nodeById(e.n1),b=nodeById(e.n2);
+  const dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy); if(L<1e-9)return;
+  const c=dx/L,s=dy/L;
+  // load direction (world unit vector) at intensity sign +
+  let dirX,dirY;
+  if(e.dist.dir==='globalY'){dirX=0;dirY=1;}
+  else if(e.dist.dir==='globalX'){dirX=1;dirY=0;}
+  else {dirX=-s;dirY=c;}
+  const wmax=Math.max(Math.abs(e.dist.w1),Math.abs(e.dist.w2))||1;
+  const maxLen=34; // px
+  const narr=Math.max(2,Math.round(L*view.scale/34));
+  ctx.strokeStyle='#e07b39'; ctx.fillStyle='#e07b39';
+  let prevTail=null;
+  for(let i=0;i<=narr;i++){
+    const t=i/narr, w=e.dist.w1+(e.dist.w2-e.dist.w1)*t;
+    const px=a.x+dx*t, py=a.y+dy*t;
+    const p=W2S(px,py);
+    const lenPx=Math.abs(w)/wmax*maxLen;
+    const sgn=Math.sign(w)||1;
+    const tx=p.x - dirX*sgn*lenPx, ty=p.y + dirY*sgn*lenPx;
+    if(lenPx>3) arrow(tx,ty,p.x,p.y,'#e07b39',1.3);
+    if(prevTail){ ctx.lineWidth=1.3; ctx.beginPath(); ctx.moveTo(prevTail.x,prevTail.y); ctx.lineTo(tx,ty); ctx.stroke(); }
+    prevTail={x:tx,y:ty};
+  }
+  const pA=W2S(a.x,a.y),pB=W2S(b.x,b.y);
+  label(pA.x-(-s)*0,pA.y-46,fmt(e.dist.w1,1),'#e07b39');
+  label(pB.x,pB.y-46,fmt(e.dist.w2,1)+' kN/m','#e07b39');
+}
+
+function diagramScale(maxVal){
+  const target=0.09*modelSize(); // world units at max
+  return maxVal>1e-9 ? target/maxVal : 0;
+}
+
+function drawDiagrams(){
+  const R=state.results;
+  const showVals=document.getElementById('showVals').checked;
+  const items=[];
+  if(document.getElementById('showN').checked) items.push({key:'N',color:getCss('--cN'),scale:diagramScale(R.maxN),unit:' kN',flip:1});
+  if(document.getElementById('showV').checked) items.push({key:'V',color:getCss('--cV'),scale:diagramScale(R.maxV),unit:' kN',flip:1});
+  if(document.getElementById('showM').checked) items.push({key:'M',color:getCss('--cM'),scale:diagramScale(R.maxM),unit:' kN·m',flip:-1}); // M on tension side
+  for(const it of items){
+    for(const e of state.elements){
+      const d=R.elems[e.id]; if(!d) continue;
+      const vals=d[it.key];
+      const nx=-d.s*it.flip, ny=d.c*it.flip; // world offset dir (local +y or -y)
+      ctx.beginPath();
+      const base=[],off=[];
+      for(let i=0;i<NSAMP;i++){
+        const x=d.x1+d.c*d.xs[i], y=d.y1+d.s*d.xs[i];
+        const ox=x+nx*vals[i]*it.scale, oy=y+ny*vals[i]*it.scale;
+        base.push(W2S(x,y)); off.push(W2S(ox,oy));
+      }
+      ctx.moveTo(base[0].x,base[0].y);
+      for(const p of off) ctx.lineTo(p.x,p.y);
+      ctx.lineTo(base[NSAMP-1].x,base[NSAMP-1].y);
+      ctx.closePath();
+      ctx.fillStyle=it.color+'22'; ctx.fill();
+      ctx.strokeStyle=it.color; ctx.lineWidth=1.6;
+      ctx.beginPath(); ctx.moveTo(off[0].x,off[0].y);
+      for(const p of off) ctx.lineTo(p.x,p.y); ctx.stroke();
+      if(showVals){
+        // label extremum and ends
+        let im=0; for(let i=1;i<NSAMP;i++) if(Math.abs(vals[i])>Math.abs(vals[im])) im=i;
+        const marks=new Set([0,NSAMP-1,im]);
+        for(const i of marks){
+          if(Math.abs(vals[i])<1e-6) continue;
+          label(off[i].x,off[i].y-9,fmt(vals[i])+it.unit,it.color);
+        }
+      }
+    }
+  }
+}
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function defScaleFactor(){
+  const R=state.results; if(!R||R.maxDisp<1e-12) return 0;
+  const auto=0.12*modelSize()/R.maxDisp;
+  return auto*(parseFloat(document.getElementById('defScale').value)/50);
+}
+
+function drawDeformed(){
+  const R=state.results, f=defScaleFactor();
+  document.getElementById('defScaleTxt').textContent='×'+(f>=10?Math.round(f):fmt(f,1));
+  ctx.strokeStyle=getCss('--cDef'); ctx.lineWidth=2; ctx.setLineDash([6,4]);
+  for(const e of state.elements){
+    const d=R.elems[e.id]; if(!d) continue;
+    ctx.beginPath();
+    for(let i=0;i<NSAMP;i++){
+      const x=d.x1+d.c*d.xs[i]+d.gdx[i]*f, y=d.y1+d.s*d.xs[i]+d.gdy[i]*f;
+      const p=W2S(x,y);
+      if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+    }
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+function drawNodeDisp(){
+  const R=state.results, u=R.u;
+  for(const n of state.nodes){
+    const i=R.idx[n.id]*3;
+    const dx=u[i]*1000, dy=u[i+1]*1000;
+    if(Math.abs(dx)<1e-4&&Math.abs(dy)<1e-4) continue;
+    const p=W2S(n.x,n.y);
+    label(p.x+6,p.y+12,'('+fmt(dx,2)+', '+fmt(dy,2)+') mm',getCss('--cDef'),'left');
+  }
+}
+
+function drawReactions(){
+  const R=state.results.reactions;
+  for(const id in R){
+    const n=nodeById(parseInt(id)); if(!n) continue;
+    const p=W2S(n.x,n.y); const r=R[id];
+    let ty=p.y+30;
+    if(r.rx!=null&&Math.abs(r.rx)>1e-6){
+      arrow(p.x-Math.sign(r.rx)*40,p.y,p.x-Math.sign(r.rx)*10,p.y,'#16a085',2);
+      label(p.x-Math.sign(r.rx)*44,p.y-10,'Rx='+fmt(r.rx)+' kN','#16a085'); }
+    if(r.ry!=null&&Math.abs(r.ry)>1e-6){
+      arrow(p.x,p.y+Math.sign(r.ry)*44,p.x,p.y+Math.sign(r.ry)*12,'#16a085',2);
+      label(p.x+6,ty+18,'Ry='+fmt(r.ry)+' kN','#16a085','left'); }
+    if(r.mz!=null&&Math.abs(r.mz)>1e-6){
+      label(p.x+6,ty+32,'Mz='+fmt(r.mz)+' kN·m','#16a085','left'); }
+  }
+}
+
+function drawPreview(){
+  if(!mouse.inCanvas) return;
+  const s=snapPoint(mouse.wx,mouse.wy);
+  if(mode==='node'||mode==='elem'||mode==='curve'){
+    const p=W2S(s.x,s.y);
+    ctx.strokeStyle='#1f6feb'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(p.x,p.y,6,0,7); ctx.stroke();
+  }
+  if(mode==='elem'&&chain!=null){
+    const a=nodeById(chain); if(!a)return;
+    const p1=W2S(a.x,a.y),p2=W2S(s.x,s.y);
+    ctx.strokeStyle='#1f6feb'; ctx.setLineDash([5,4]); ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); ctx.setLineDash([]);
+    label((p1.x+p2.x)/2,(p1.y+p2.y)/2-10,fmt(Math.hypot(s.x-a.x,s.y-a.y),2)+' m','#1f6feb');
+  }
+  if(mode==='curve'&&curvePts.length){
+    ctx.strokeStyle='#1f6feb'; ctx.setLineDash([5,4]); ctx.lineWidth=1.4;
+    ctx.beginPath();
+    const pts=curvePts.concat([{x:s.x,y:s.y}]);
+    if(pts.length===2){ const p1=W2S(pts[0].x,pts[0].y),p2=W2S(pts[1].x,pts[1].y);
+      ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); }
+    else { const [P0,P1,P2]=pts;
+      for(let i=0;i<=24;i++){ const t=i/24,mt=1-t;
+        const x=mt*mt*P0.x+2*mt*t*P1.x+t*t*P2.x, y=mt*mt*P0.y+2*mt*t*P1.y+t*t*P2.y;
+        const p=W2S(x,y); if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y); } }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+/* ---------- hover readout ---------- */
+function updateHover(sx,sy,clientX,clientY){
+  const hb=document.getElementById('hoverBox');
+  tooltip.classList.add('hidden');
+  if(!state.results){ return; }
+  const R=state.results;
+  // nearest node?
+  const n=nodeAtScreen(sx,sy,10);
+  if(n){
+    const i=R.idx[n.id]*3,u=R.u;
+    let t='Node '+n.id+'\nδx = '+fmt(u[i]*1000)+' mm\nδy = '+fmt(u[i+1]*1000)+' mm\nθz = '+u[i+2].toExponential(3)+' rad';
+    const rr=R.reactions[n.id];
+    if(rr) t+='\n'+(rr.rx!=null?'Rx = '+fmt(rr.rx)+' kN\n':'')+(rr.ry!=null?'Ry = '+fmt(rr.ry)+' kN\n':'')+(rr.mz!=null?'Mz = '+fmt(rr.mz)+' kN·m':'');
+    showTip(t,clientX,clientY); hb.textContent=t; return;
+  }
+  // nearest element sample
+  let best=null,bd=12;
+  for(const e of state.elements){
+    const d=R.elems[e.id]; if(!d)continue;
+    for(let i=0;i<NSAMP;i++){
+      const x=d.x1+d.c*d.xs[i], y=d.y1+d.s*d.xs[i];
+      const p=W2S(x,y);
+      const dist=Math.hypot(p.x-sx,p.y-sy);
+      if(dist<bd){bd=dist;best={e,d,i};}
+    }
+  }
+  if(best){
+    const {e,d,i}=best;
+    const t='Element '+e.id+'  @ x = '+fmt(d.xs[i],3)+' m from node '+e.n1+
+      '\nN = '+fmt(d.N[i])+' kN'+(d.N[i]>0?' (tension)':d.N[i]<0?' (compression)':'')+
+      '\nV = '+fmt(d.V[i])+' kN'+
+      '\nM = '+fmt(d.M[i])+' kN·m'+
+      '\nδx = '+fmt(d.gdx[i]*1000)+' mm\nδy = '+fmt(d.gdy[i]*1000)+' mm'+
+      '\n|δ| = '+fmt(Math.hypot(d.gdx[i],d.gdy[i])*1000)+' mm';
+    showTip(t,clientX,clientY); hb.textContent=t;
+  }
+}
+function showTip(text,cx,cy){
+  const wrap=cv.parentElement.getBoundingClientRect();
+  tooltip.textContent=text;
+  tooltip.classList.remove('hidden');
+  let x=cx-wrap.left+16, y=cy-wrap.top+16;
+  tooltip.style.left='0px'; tooltip.style.top='0px';
+  const tw=tooltip.offsetWidth, th=tooltip.offsetHeight;
+  if(x+tw>wrap.width-8) x=cx-wrap.left-tw-12;
+  if(y+th>wrap.height-8) y=cy-wrap.top-th-12;
+  tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
+}
+
+/* ---------- events ---------- */
+cv.addEventListener('mousedown',ev=>{
+  const r=cv.getBoundingClientRect();
+  const sx=ev.clientX-r.left, sy=ev.clientY-r.top;
+  if(ev.button===1||spaceDown){ panning={sx,sy,cx:view.cx,cy:view.cy}; ev.preventDefault(); return; }
+  if(ev.button===0){ const w=S2W(sx,sy); handleClick(w.x,w.y,sx,sy); commit(); }
+});
+window.addEventListener('mouseup',()=>{panning=null;});
+cv.addEventListener('mousemove',ev=>{
+  const r=cv.getBoundingClientRect();
+  const sx=ev.clientX-r.left, sy=ev.clientY-r.top;
+  mouse.sx=sx; mouse.sy=sy; mouse.inCanvas=true;
+  if(panning){
+    view.cx=panning.cx-(sx-panning.sx)/view.scale;
+    view.cy=panning.cy+(sy-panning.sy)/view.scale;
+    draw(); return;
+  }
+  const w=S2W(sx,sy); mouse.wx=w.x; mouse.wy=w.y;
+  document.getElementById('coords').textContent='x: '+fmt(w.x,2)+', y: '+fmt(w.y,2)+' m';
+  updateHover(sx,sy,ev.clientX,ev.clientY);
+  draw();
+});
+cv.addEventListener('mouseleave',()=>{mouse.inCanvas=false;tooltip.classList.add('hidden');draw();});
+cv.addEventListener('wheel',ev=>{
+  ev.preventDefault();
+  const r=cv.getBoundingClientRect();
+  const sx=ev.clientX-r.left, sy=ev.clientY-r.top;
+  const before=S2W(sx,sy);
+  view.scale*=ev.deltaY<0?1.15:1/1.15;
+  view.scale=Math.max(5,Math.min(2000,view.scale));
+  const after=S2W(sx,sy);
+  view.cx+=before.x-after.x; view.cy+=before.y-after.y;
+  draw();
+},{passive:false});
+cv.addEventListener('contextmenu',ev=>{ev.preventDefault(); chain=null; curvePts=[]; draw();});
+window.addEventListener('keydown',ev=>{
+  if(ev.target.tagName==='INPUT'||ev.target.tagName==='SELECT')return;
+  if((ev.ctrlKey||ev.metaKey)&&!ev.altKey){
+    const k=ev.key.toLowerCase();
+    if(k==='z'&&!ev.shiftKey){ ev.preventDefault(); undo(); return; }
+    if(k==='y'||(k==='z'&&ev.shiftKey)){ ev.preventDefault(); redo(); return; }
+  }
+  if(ev.code==='Space'){spaceDown=true;cv.style.cursor='grab';ev.preventDefault();}
+  if(ev.key==='Escape'){chain=null;curvePts=[];selection=null;updateSelBox();draw();}
+  if(ev.key==='Delete'&&selection){
+    if(selection.type==='node'){const n=nodeById(selection.id);if(n)deleteNode(n);}
+    else{const e=elemById(selection.id);if(e)deleteElement(e);}
+    selection=null;updateSelBox();draw();commit();
+  }
+  const keys={v:'select',n:'node',e:'elem',c:'curve'};
+  if(keys[ev.key]) setMode(keys[ev.key]);
+});
+window.addEventListener('keyup',ev=>{ if(ev.code==='Space'){spaceDown=false;cv.style.cursor='crosshair';} });
+
+const HINTS={
+  select:'Click a node or element to inspect/edit. Middle-drag or Space+drag to pan, wheel to zoom.',
+  node:'Click to add a node (snaps to '+GRID+' m grid). Clicking on an element splits it.',
+  elem:'Click start point, then keep clicking to chain elements. Right-click or Esc to finish.',
+  curve:'Click 3 points: start, control, end. The curve is meshed into 8 beam segments.',
+  pin:'Click a node to add/remove a pinned support (restrains ux, uy).',
+  roller:'Click a node to add/remove a roller (restrains uy).',
+  fixed:'Click a node to add/remove a fixed support (restrains ux, uy, rz).',
+  pload:'Click a node to set Fx / Fy point load.',
+  mload:'Click a node to set a concentrated moment (CCW positive).',
+  dload:'Click an element to set a distributed / trapezoidal load.',
+  dispload:'Click a node to prescribe displacement (settlement) — this acts as displacement loading.',
+  delete:'Click a node (deletes attached elements too) or an element to remove it.'
+};
+document.getElementById('btnUndo').onclick=undo;
+document.getElementById('btnRedo').onclick=redo;
+function setMode(m){
+  mode=m; chain=null; curvePts=[];
+  document.querySelectorAll('#toolbar .tool').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
+  document.getElementById('hint').textContent=HINTS[m]||'';
+  draw();
+}
+document.querySelectorAll('#toolbar .tool').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+
+document.getElementById('btnSolve').onclick=()=>{
+  const res=runSolve(state.nodes,state.elements);
+  if(res.error){ alert(res.error); state.results=null; }
+  else state.results=res;
+  updateReactBox(); updateSelBox(); draw();
+};
+document.getElementById('btnNew').onclick=()=>{
+  if(state.nodes.length&&!confirm('Clear the whole model?'))return;
+  state.nodes=[];state.elements=[];state.nextN=1;state.nextE=1;state.results=null;
+  selection=null;chain=null;curvePts=[];updateSelBox();updateReactBox();draw();commit();
+};
+['showR','showN','showV','showM','showDef','showVals'].forEach(id=>
+  document.getElementById(id).onchange=draw);
+document.getElementById('defScale').oninput=draw;
+/* ---------- examples ---------- */
+function fitView(){
+  if(!state.nodes.length)return;
+  let x0=1/0,x1=-1/0,y0=1/0,y1=-1/0;
+  for(const n of state.nodes){x0=Math.min(x0,n.x);x1=Math.max(x1,n.x);y0=Math.min(y0,n.y);y1=Math.max(y1,n.y);}
+  const r=cv.getBoundingClientRect();
+  view.cx=(x0+x1)/2; view.cy=(y0+y1)/2;
+  const w=Math.max(1,x1-x0),h=Math.max(1,y1-y0);
+  view.scale=Math.min((r.width-160)/w,(r.height-200)/h);
+  view.scale=Math.max(10,Math.min(300,view.scale));
+}
+document.getElementById('examples').onchange=function(){
+  const v=this.value; this.value='';
+  if(!v)return;
+  state.nodes=[];state.elements=[];state.nextN=1;state.nextE=1;state.results=null;selection=null;
+  const fr={type:'frame',E:210e6,A:0.01,I:1e-4};
+  const tr={type:'truss',E:210e6,A:0.002,I:1e-6};
+  if(v==='beam'){
+    const a=addNode(0,0),b=addNode(6,0);
+    a.support='pin'; b.support='roller';
+    const e=addElement(a.id,b.id,fr);
+    e.dist={dir:'globalY',w1:-10,w2:-10};
+  } else if(v==='frame'){
+    const a=addNode(0,0),b=addNode(0,4),c=addNode(6,4),d=addNode(6,0);
+    a.support='fixed'; d.support='fixed';
+    addElement(a.id,b.id,fr); const eb=addElement(b.id,c.id,fr); addElement(c.id,d.id,fr);
+    eb.dist={dir:'globalY',w1:-15,w2:-15};
+    b.load={fx:20,fy:0,m:0};
+  } else if(v==='truss'){
+    const bot=[],top=[];
+    for(let i=0;i<=4;i++) bot.push(addNode(i*2,0));
+    for(let i=1;i<4;i++) top.push(addNode(i*2,2));
+    bot[0].support='pin'; bot[4].support='roller';
+    for(let i=0;i<4;i++) addElement(bot[i].id,bot[i+1].id,tr);
+    for(let i=0;i<2;i++) addElement(top[i].id,top[i+1].id,tr);
+    addElement(bot[0].id,top[0].id,tr); addElement(top[2].id,bot[4].id,tr);
+    addElement(bot[1].id,top[0].id,tr); addElement(bot[2].id,top[1].id,tr); addElement(bot[3].id,top[2].id,tr);
+    addElement(top[0].id,bot[2].id,tr); addElement(top[1].id,bot[3].id,tr);
+    bot[1].load={fx:0,fy:-20,m:0}; bot[2].load={fx:0,fy:-20,m:0}; bot[3].load={fx:0,fy:-20,m:0};
+  } else if(v==='arch'){
+    // parabolic-ish arch via two quadratic curves
+    const P0={x:0,y:0},P1={x:3,y:4},P2={x:6,y:4},P3={x:9,y:4},P4={x:12,y:0};
+    const bez=(A,B,C,n)=>{ let prev=addNode(A.x,A.y);
+      for(let i=1;i<=n;i++){const t=i/n,mt=1-t;
+        const x=mt*mt*A.x+2*mt*t*B.x+t*t*C.x, y=mt*mt*A.y+2*mt*t*B.y+t*t*C.y;
+        const nn=addNode(Math.round(x*1000)/1000,Math.round(y*1000)/1000);
+        addElement(prev.id,nn.id,fr); prev=nn; } return prev; };
+    bez(P0,{x:1.5,y:3.2},{x:6,y:4.4},8);
+    bez({x:6,y:4.4},{x:10.5,y:3.2},P4,8);
+    nodeById(1).support='pin';
+    state.nodes[state.nodes.length-1].support='pin';
+    // crown point load
+    const crown=state.nodes.find(n=>Math.abs(n.x-6)<0.01&&n.y>4);
+    if(crown) crown.load={fx:0,fy:-30,m:0};
+  }
+  invalidate(); fitView(); updateSelBox(); draw(); commit();
+};
+
+/* ---------- init ---------- */
+setMode('select');
+resize();
+lastCommitted=snapshot(); history.stack=[lastCommitted]; history.idx=0; updateUndoButtons();
+</script>
+</body>
+</html>
