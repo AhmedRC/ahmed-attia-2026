@@ -112,7 +112,7 @@ const MODEL = (() => {
       ],
       combos: [
         { id: "U1", name: "1.4D",        factors: { DL: 1.4, LL: 0.0 }, type: "strength" },
-        { id: "U2", name: "1.2D + 1.6L", factors: { DL: 1.2, LL: 1.6 }, type: "strength" },
+        { id: "U2", name: "1.4D + 1.6L", factors: { DL: 1.4, LL: 1.6 }, type: "strength" },
         { id: "S1", name: "D + L",       factors: { DL: 1.0, LL: 1.0 }, type: "service" }
       ],
       meshSettings: { maxSize: 0.5 },

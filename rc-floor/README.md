@@ -18,7 +18,7 @@ No installation required. Open **`index.html`** in Chrome, Edge or Firefox
 2. Press **1 Mesh** — the FE mesh is generated (max element size adjustable
    in the right panel).
 3. Press **2 Analyze** — cases D and L are solved and combined
-   (1.4D, 1.2D+1.6L, D+L).
+   (1.4D, 1.4D+1.6L, D+L).
 4. Browse results with the two dropdowns: deflection, slab moment contours
    Mx/My/Mxy, shear, beam BMD/SFD/torsion, reactions.
 5. Press **3 Design** — ACI 318-19 design of beams, slabs, punching and columns.
