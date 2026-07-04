@@ -132,6 +132,7 @@ h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); margin-bottom: .6em; }
 .btn-gold:hover { background: var(--gold-light); box-shadow: 0 12px 34px rgba(201,162,39,.5); }
 .btn-ghost { border: 1.5px solid rgba(255,255,255,.45); color: var(--white); }
 .btn-ghost:hover { border-color: var(--gold-light); color: var(--gold-light); }
+.btn-wide { padding-left: 44px; padding-right: 44px; min-width: 250px; text-align: center; }
 
 .hero-profiles { margin-top: 22px; display: flex; gap: 12px; align-items: center; font-size: .9rem; }
 .hero-profiles a { color: #c9d5e0; border-bottom: 1px solid rgba(201,162,39,.5); padding-bottom: 1px; transition: color .2s; }
