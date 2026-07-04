@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FEA Online — Dr. Ahmed Attia M. Drar</title>
+<meta name="description" content="Free online finite-element analysis tools by Dr. Ahmed Attia Drar — 2D structural frame analysis and reinforced-concrete floor plan analysis & design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0e2238; --navy-2:#14304d; --navy-3:#1b3f63;
+    --gold:#c9a227; --gold-light:#e3c563;
+    --white:#fff; --muted:#9fb1c4; --line:rgba(227,197,99,.22);
+    --font-head:"Fraunces",Georgia,serif; --font-body:"Inter",-apple-system,"Segoe UI",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-x:hidden}
+  body{
+    font-family:var(--font-body); color:var(--white); line-height:1.65;
+    min-height:100vh; display:flex; flex-direction:column;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(201,162,39,.14), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(27,63,99,.55), transparent 60%),
+      var(--navy);
+  }
+  a{color:inherit; text-decoration:none}
+  .container{width:min(1080px,92%); margin:0 auto}
+
+  /* nav */
+  .nav{padding:22px 0}
+  .nav-inner{display:flex; align-items:center; justify-content:space-between}
+  .brand{font-family:var(--font-head); font-weight:700; font-size:1.25rem; letter-spacing:.2px}
+  .brand span{color:var(--gold-light)}
+  .nav-back{font-size:.9rem; color:var(--muted); padding:8px 16px; border:1px solid var(--line); border-radius:999px; transition:.25s}
+  .nav-back:hover{border-color:var(--gold); color:var(--gold-light)}
+
+  /* hero head */
+  .head{text-align:center; padding:clamp(40px,8vw,90px) 0 clamp(24px,4vw,44px)}
+  .kicker{text-transform:uppercase; letter-spacing:.26em; font-size:.78rem; font-weight:700; color:var(--gold); margin-bottom:14px}
+  .head h1{font-family:var(--font-head); font-weight:600; font-size:clamp(2.3rem,6vw,3.9rem); line-height:1.12}
+  .head h1 em{font-style:normal; color:var(--gold-light)}
+  .head p{max-width:620px; margin:20px auto 0; color:#c9d5e0; font-size:1.06rem}
+
+  /* cards */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:26px; padding:14px 0 clamp(60px,10vw,110px)}
+  @media(max-width:760px){ .grid{grid-template-columns:1fr} }
+  .card{
+    position:relative; display:flex; flex-direction:column;
+    background:linear-gradient(180deg, rgba(27,63,99,.55), rgba(20,48,77,.35));
+    border:1px solid var(--line); border-radius:22px; padding:38px 34px 34px;
+    overflow:hidden; transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .4s;
+  }
+  .card::after{content:""; position:absolute; inset:0; border-radius:22px; pointer-events:none;
+    box-shadow:inset 0 0 0 1px transparent; transition:box-shadow .4s}
+  .card:hover{transform:translateY(-8px); border-color:rgba(201,162,39,.6);
+    box-shadow:0 26px 60px rgba(0,0,0,.35), 0 0 0 1px rgba(201,162,39,.25)}
+  .card-icon{
+    width:64px; height:64px; border-radius:16px; display:grid; place-items:center;
+    background:rgba(201,162,39,.12); border:1px solid var(--line); margin-bottom:22px;
+    color:var(--gold-light);
+  }
+  .card-icon svg{width:34px; height:34px; stroke:var(--gold-light); fill:none; stroke-width:1.6}
+  .card .step{font-size:.74rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:10px}
+  .card h2{font-family:var(--font-head); font-weight:600; font-size:1.7rem; margin-bottom:12px; color:#fff}
+  .card p{color:#c2d0dd; font-size:1rem; flex:1}
+  .card ul{list-style:none; margin:18px 0 26px; display:flex; flex-wrap:wrap; gap:8px}
+  .card ul li{font-size:.8rem; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:5px 12px}
+  .card-cta{
+    display:inline-flex; align-items:center; gap:10px; align-self:flex-start;
+    font-weight:600; font-size:1rem; color:var(--navy);
+    background:linear-gradient(180deg,var(--gold-light),var(--gold));
+    padding:13px 26px; border-radius:999px; transition:gap .3s, filter .3s;
+  }
+  .card:hover .card-cta{gap:16px; filter:brightness(1.06)}
+  .card-link{position:absolute; inset:0; z-index:2} /* whole card clickable */
+  .card-cta{position:relative; z-index:1}
+
+  footer{margin-top:auto; padding:26px 0; text-align:center; color:var(--muted); font-size:.85rem; border-top:1px solid rgba(255,255,255,.06)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">Ahmed&nbsp;Attia&nbsp;<span>DRAR</span></a>
+    <a href="index.html" class="nav-back">← Home</a>
+  </div>
+</header>
+
+<main class="container">
+  <div class="head">
+    <p class="kicker">Free Online Tools</p>
+    <h1>FEA <em>Online</em></h1>
+    <p>Browser-based finite-element analysis — no install, no sign-up. Choose the analysis you need.</p>
+  </div>
+
+  <div class="grid">
+    <!-- Card 1: 2D structural analysis -->
+    <article class="card">
+      <a href="fea.html" class="card-link" aria-label="Open 2D Structural Analysis"></a>
+      <div class="card-icon">
+        <svg viewBox="0 0 32 32"><path d="M3 27h26M6 27V9l10-6 10 6v18M6 15h20M16 3v24M6 21h20"/></svg>
+      </div>
+      <div class="step">FEA 2D</div>
+      <h2>2D Structural Analysis</h2>
+      <p>Interactive plane-frame &amp; truss solver — build a model, apply supports and loads, and read axial force, shear, bending-moment and deflection diagrams in real time.</p>
+      <ul><li>Beams &amp; frames</li><li>Trusses</li><li>BMD / SFD</li><li>Deflections</li></ul>
+      <span class="card-cta">Open 2D Analysis →</span>
+    </article>
+
+    <!-- Card 2: RC floor plan -->
+    <article class="card">
+      <a href="rc-floor/index.html" class="card-link" aria-label="Open RC Floor Plan analysis"></a>
+      <div class="card-icon">
+        <svg viewBox="0 0 32 32"><path d="M4 4h24v24H4zM4 12h24M12 4v24M20 12v16M4 20h8"/></svg>
+      </div>
+      <div class="step">RC-Floor FEA</div>
+      <h2>RC Floor Plan</h2>
+      <p>Finite-element analysis &amp; design of reinforced-concrete floors — draw slabs, beams and columns, mesh, solve for moments and deflections, then design and report.</p>
+      <ul><li>Slabs &amp; openings</li><li>Beams &amp; columns</li><li>Mesh &amp; solve</li><li>Design &amp; report</li></ul>
+      <span class="card-cta">Open RC Floor →</span>
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="container">© <span id="yr"></span> Dr. Ahmed Attia Mahmoud Drar — Structural Engineering Tools</div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
