@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RC-FEA 2D — [Untitled]</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap");
+  /* Ahmed Attia Drar brand theme — navy + gold */
+  :root{ --chrome:#14304d; --chrome-dk:#26496e; --sel:#c9a227;
+         --navy:#0e2238; --panel2:#1b3f63; --gold:#c9a227; --gold-light:#e3c563;
+         --text:#e6edf5; --muted:#9fb1c4; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%; overflow:hidden;}
+  body{font-family:"Inter","Segoe UI",Tahoma,Arial,sans-serif; font-size:13px; background:var(--chrome);
+       color:var(--text); display:flex; flex-direction:column;}
+  /* title bar */
+  #titlebar{background:linear-gradient(#14304d,#0e2238); color:#fff; padding:5px 10px;
+    font-weight:600; display:flex; align-items:center; gap:8px; user-select:none;
+    font-family:"Fraunces",Georgia,serif; border-bottom:1px solid rgba(227,197,99,.35);}
+  #titlebar .dot{width:16px;height:16px;border-radius:3px;background:var(--gold);display:inline-flex;
+    align-items:center;justify-content:center;font-size:10px;color:#0e2238;}
+  #titlebar a.hub-back{color:var(--muted);text-decoration:none;font-size:12px;font-family:"Inter",sans-serif;
+    border:1px solid var(--chrome-dk);padding:3px 9px;border-radius:5px;margin-right:2px;font-weight:400;}
+  #titlebar a.hub-back:hover{border-color:var(--gold);color:var(--gold-light);}
+  #titlebar a.site-back{margin-left:auto;color:var(--gold-light);text-decoration:none;font-size:12px;
+    font-weight:600;font-family:"Inter",sans-serif;border:1px solid rgba(227,197,99,.5);
+    padding:3px 14px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;}
+  #titlebar a.site-back:hover{background:var(--gold-light);color:var(--navy);}
+  /* menu bar */
+  #menubar{background:var(--chrome); border-bottom:1px solid var(--chrome-dk);
+    display:flex; gap:2px; padding:2px 6px; user-select:none;}
+  .menu-item{padding:3px 9px; cursor:pointer; border-radius:2px; color:var(--text);}
+  .menu-item:hover{background:var(--panel2);}
+  /* toolbar */
+  #toolbar{background:var(--chrome); border-bottom:1px solid var(--chrome-dk);
+    display:flex; gap:3px; padding:3px 6px; align-items:center;}
+  .tbtn{width:28px;height:26px; border:1px solid transparent; background:transparent;
+    cursor:pointer; font-size:14px; color:var(--text); display:inline-flex;align-items:center;justify-content:center;}
+  .tbtn:hover{border-color:var(--gold); background:var(--panel2);}
+  .tsep{width:1px;height:20px;background:var(--chrome-dk);margin:0 4px;}
+  /* main layout */
+  #main{flex:1; display:flex; min-height:0;}
+  #left{width:258px; min-width:190px; background:var(--navy); border-right:2px solid var(--chrome-dk);
+    display:flex; flex-direction:column;}
+  #left .lp-head{background:var(--chrome); padding:5px 8px; border-bottom:1px solid var(--chrome-dk);
+    font-size:12px; display:flex; gap:10px;}
+  #tree{flex:1; overflow:auto; padding:6px 2px;}
+  .tree-root{color:var(--gold-light); font-weight:700; padding:2px 8px;}
+  .tree-item{padding:2px 8px; cursor:default; white-space:nowrap; color:var(--text);}
+  .tree-item[data-id]{cursor:pointer;}
+  .tree-item[data-id]:hover{background:var(--panel2);}
+  .tree-item.sel{background:var(--sel); color:#0e2238;}
+  .tree-bold{font-weight:700; color:var(--gold-light);}
+  .ticon{display:inline-block; width:20px; text-align:center; margin-right:2px; font-size:11px;}
+  /* center */
+  #center{flex:1; display:flex; flex-direction:column; min-width:0;}
+  #canvas-wrap{flex:1; background:#111; border:2px solid var(--chrome-dk); margin:4px; position:relative; min-height:0;}
+  #cv-head{background:linear-gradient(#1b3f63,#14304d); padding:3px 8px; font-size:12px; color:var(--text);
+    border-bottom:1px solid var(--chrome-dk); display:flex; align-items:center; gap:8px;}
+  canvas{display:block; background:#000; cursor:grab;}
+  canvas:active{cursor:grabbing;}
+  /* bottom */
+  #bottom{height:240px; display:flex; border-top:2px solid var(--chrome-dk); background:var(--chrome);}
+  #form-panel{width:56%; min-width:380px; background:var(--navy); border-right:2px solid var(--chrome-dk);
+    overflow:auto; padding:8px 12px;}
+  .ftitle{font-weight:700; color:var(--gold-light); border-bottom:1px solid var(--chrome-dk); padding-bottom:4px;
+    margin-bottom:8px; font-family:"Fraunces",Georgia,serif;}
+  .frow{display:flex; align-items:center; gap:8px; margin:4px 0;}
+  .frow span{width:210px; color:var(--muted);}
+  .frow input[type=number], .frow input[type=text]{width:110px; padding:2px 5px; border:1px solid var(--chrome-dk);
+    background:var(--panel2); color:var(--text);}
+  .frow select{padding:2px 4px; border:1px solid var(--chrome-dk); background:var(--panel2); color:var(--text);}
+  .frow em{color:var(--muted); font-style:normal; font-size:12px;}
+  .fnote{color:var(--muted); font-size:12px; margin-top:8px; line-height:1.5;}
+  .btn{margin:6px 4px 0 0; padding:4px 10px; border:1px solid var(--chrome-dk); background:var(--panel2);
+    color:var(--text); cursor:pointer; border-radius:2px;}
+  .btn:hover{border-color:var(--gold); color:var(--gold-light);}
+  .btn-run{font-weight:700; color:#0e2238; background:var(--gold); border-color:var(--gold); padding:8px 22px; font-size:14px;}
+  .btn-run:hover{background:var(--gold-light); color:#0e2238;}
+  .rtable{border-collapse:collapse; margin-top:4px;}
+  .rtable th,.rtable td{border:1px solid var(--chrome-dk); padding:2px 6px; font-size:12px;}
+  .rtable th{background:var(--navy); color:var(--gold-light); font-weight:600;}
+  .rtable input{width:78px; border:1px solid var(--chrome-dk); background:var(--panel2); color:var(--text); padding:1px 3px;}
+  #log-panel{flex:1; display:flex; flex-direction:column;}
+  #log-panel .lp-head{background:var(--chrome); padding:4px 8px; font-size:12px; font-weight:600;
+    border-bottom:1px solid var(--chrome-dk);}
+  #log{flex:1; overflow:auto; background:#0a1929; color:#9fd49f; font-family:Consolas,monospace;
+    font-size:12px; padding:6px 8px; line-height:1.5;}
+  .log-h{color:#7ec2ff; font-weight:700;}
+  .log-ok{color:#6dff9e;}
+  .log-err{color:#ff7d6d;}
+  #statusbar{background:var(--navy); border-top:1px solid var(--chrome-dk); padding:3px 10px;
+    font-size:12px; color:var(--muted);}
+</style>
+</head>
+<body>
+  <div id="titlebar"><a class="hub-back" href="../fea-online.html" title="Back to FEA hub">← FEA</a><span class="dot">2D</span> RC-FEA 2D — Nonlinear FE Analysis of Reinforced Concrete <span style="opacity:.7;font-weight:400">[research-educational tool]</span><a class="site-back" href="../index.html">← Back to website</a></div>
+  <div id="menubar">
+    <span class="menu-item" data-act="new">File</span>
+    <span class="menu-item">Edit</span>
+    <span class="menu-item" data-act="open">Input</span>
+    <span class="menu-item" data-act="run">Calculations</span>
+    <span class="menu-item">Options</span>
+    <span class="menu-item">Windows</span>
+    <span class="menu-item" data-act="about">Help</span>
+  </div>
+  <div id="toolbar">
+    <button class="tbtn" id="tb-new"  title="New model">🗋</button>
+    <button class="tbtn" id="tb-open" title="Open model (.rcfea.json)">📂</button>
+    <button class="tbtn" id="tb-save" title="Save model (.rcfea.json)">💾</button>
+    <span class="tsep"></span>
+    <button class="tbtn" id="tb-zin"  title="Zoom in">🔍+</button>
+    <button class="tbtn" id="tb-zout" title="Zoom out">🔍−</button>
+    <button class="tbtn" id="tb-fit"  title="Fit view">⛶</button>
+    <span class="tsep"></span>
+    <button class="tbtn" id="tb-model" title="Show model">▭</button>
+    <button class="tbtn" id="tb-res"   title="Show results">🌈</button>
+    <span class="tsep"></span>
+    <button class="tbtn" id="tb-run" title="Run analysis" style="color:#e3c563;font-weight:700">▶</button>
+    <input type="file" id="file-open" accept=".json" style="display:none">
+  </div>
+  <div id="main">
+    <div id="left">
+      <div class="lp-head"><b>Data tree</b></div>
+      <div id="tree"></div>
+    </div>
+    <div id="center">
+      <div id="canvas-wrap">
+        <div id="cv-head">🌤 <b>Input 1</b> — active load case LC1 (drag = pan, wheel = zoom)</div>
+        <canvas id="cv"></canvas>
+      </div>
+      <div id="bottom">
+        <div id="form-panel"><div id="form-host"></div></div>
+        <div id="log-panel">
+          <div class="lp-head">Messages / material diagrams</div>
+          <canvas id="matplot" width="420" height="180" style="display:none;background:#10151c;border-bottom:1px solid #333;width:100%;"></canvas>
+          <div id="log"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="statusbar">ready</div>
+<script>
+/* ============================================================
+   RC-FEA 2D — solver core v2 (general topology)
+   Units: mm, N, MPa.
+   Topology: joints -> lines -> rectangular macro-elements with
+   assigned concrete materials, meshed on a shared rectilinear
+   grid. Axis-aligned bar reinforcement with bond springs.
+   Supports and loads on any joints or lines, X/Y direction.
+   Concrete: Q4 plane stress + isotropic damage
+     tension:  sigma = ft exp(-(e1-e0)/(ef-e0)), ef = e0+Gf/(ft*h)
+     compress: parabola fc(2x-x^2) to ec0=2fc/E, linear softening
+               to 0.2fc at ecu (crushing)
+   Steel: bilinear + rupture at eu. Bond: full fib MC2010 law.
+   Solver: banded LDL^T, total-secant iteration, load steps,
+   failure detection (rupture / blow-up).
+   ============================================================ */
+"use strict";
+
+// ---------- banded symmetric solver ----------
+function bandFactor(B, n, hb) {
+  const w = hb + 1;
+  for (let k = 0; k < n; k++) {
+    let dkk = B[k * w];
+    const m0 = Math.max(0, k - hb);
+    for (let m = m0; m < k; m++) {
+      const Lkm = B[k * w + (k - m)];
+      dkk -= Lkm * Lkm * B[m * w];
+    }
+    if (Math.abs(dkk) < 1e-30) dkk = 1e-30;
+    B[k * w] = dkk;
+    const iMax = Math.min(n - 1, k + hb);
+    for (let i = k + 1; i <= iMax; i++) {
+      let s = B[i * w + (i - k)];
+      const mm0 = Math.max(0, i - hb, k - hb);
+      for (let m = mm0; m < k; m++) s -= B[i * w + (i - m)] * B[k * w + (k - m)] * B[m * w];
+      B[i * w + (i - k)] = s / dkk;
+    }
+  }
+}
+function bandSolve(B, n, hb, f) {
+  const w = hb + 1, x = Float64Array.from(f);
+  for (let i = 0; i < n; i++) {
+    const m0 = Math.max(0, i - hb);
+    let s = x[i];
+    for (let m = m0; m < i; m++) s -= B[i * w + (i - m)] * x[m];
+    x[i] = s;
+  }
+  for (let i = 0; i < n; i++) x[i] /= B[i * w];
+  for (let i = n - 1; i >= 0; i--) {
+    const iMax = Math.min(n - 1, i + hb);
+    let s = x[i];
+    for (let j = i + 1; j <= iMax; j++) s -= B[j * w + (j - i)] * x[j];
+    x[i] = s;
+  }
+  return x;
+}
+
+// ---------- grid / topology mesher ----------
+// p.joints: [{x,y}], p.macros: [{jl:[jointIdx..], mat:matIdx}],
+// p.bars: [{j1,j2,nBars,dia,Es,fy,hPct,euPct}], p.meshSize: h
+// p.supports: [{type:'joint'|'line', a, b, fx, fy}]  (a,b joint indices)
+// p.loads:    [{type:'joint'|'line', a, b, dir:'x'|'y', val}] val in kN or kN/m (sign kept)
+function macroBBox(p, m) {
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const j of m.jl) {
+    const J = p.joints[j];
+    if (!J) continue;
+    x0 = Math.min(x0, J.x); x1 = Math.max(x1, J.x);
+    y0 = Math.min(y0, J.y); y1 = Math.max(y1, J.y);
+  }
+  return { x0, x1, y0, y1 };
+}
+function uniqSorted(arr, tol) {
+  arr.sort((a, b) => a - b);
+  const out = [];
+  for (const v of arr) if (!out.length || v - out[out.length - 1] > tol) out.push(v);
+  return out;
+}
+function buildGeometry(p) {
+  const tol = 0.5;
+  const h = Math.max(5, p.meshSize || 50);
+  // grid seed coordinates: every joint coordinate
+  let xs = [], ys = [];
+  for (const J of p.joints) { xs.push(J.x); ys.push(J.y); }
+  xs = uniqSorted(xs, tol); ys = uniqSorted(ys, tol);
+  if (xs.length < 2 || ys.length < 2) throw new Error('Need at least 2 distinct x and y joint coordinates.');
+  // subdivide intervals by target size h
+  const XG = [xs[0]], YG = [ys[0]];
+  for (let i = 1; i < xs.length; i++) {
+    const n = Math.max(1, Math.round((xs[i] - xs[i - 1]) / h));
+    for (let k = 1; k <= n; k++) XG.push(xs[i - 1] + (xs[i] - xs[i - 1]) * k / n);
+  }
+  for (let i = 1; i < ys.length; i++) {
+    const n = Math.max(1, Math.round((ys[i] - ys[i - 1]) / h));
+    for (let k = 1; k <= n; k++) YG.push(ys[i - 1] + (ys[i] - ys[i - 1]) * k / n);
+  }
+  const nxg = XG.length - 1, nyg = YG.length - 1;
+  // cell material assignment (last macro wins)
+  const cellMat = new Int16Array(nxg * nyg).fill(-1);
+  const cellThk = new Float64Array(nxg * nyg);
+  const boxes = p.macros.map(m => macroBBox(p, m));
+  for (let i = 0; i < nxg; i++) for (let j = 0; j < nyg; j++) {
+    const cx = (XG[i] + XG[i + 1]) / 2, cy = (YG[j] + YG[j + 1]) / 2;
+    for (let mi = 0; mi < p.macros.length; mi++) {
+      const b = boxes[mi];
+      if (cx > b.x0 && cx < b.x1 && cy > b.y0 && cy < b.y1) {
+        cellMat[i * nyg + j] = p.macros[mi].mat;
+        cellThk[i * nyg + j] = p.macros[mi].b || p.thickness || 200;
+      }
+    }
+  }
+  // active grid nodes
+  const gN = (nxg + 1) * (nyg + 1);
+  const act = new Uint8Array(gN);
+  const gid = (i, j) => i * (nyg + 1) + j;
+  for (let i = 0; i < nxg; i++) for (let j = 0; j < nyg; j++) {
+    if (cellMat[i * nyg + j] >= 0) { act[gid(i, j)] = 1; act[gid(i + 1, j)] = 1; act[gid(i, j + 1)] = 1; act[gid(i + 1, j + 1)] = 1; }
+  }
+  return { XG, YG, nxg, nyg, cellMat, cellThk, act, gid, tol };
+}
+
+function buildModel(p) {
+  const g = buildGeometry(p);
+  const { XG, YG, nxg, nyg, cellMat, cellThk, act, gid } = g;
+
+  // ---- bar nodes: axis-aligned bars snapped to grid lines ----
+  // per grid column ix collect bar nodes so numbering stays banded
+  const nearIdx = (arr, v) => {
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < arr.length; i++) { const d = Math.abs(arr[i] - v); if (d < bd) { bd = d; best = i; } }
+    return best;
+  };
+  const barDefs = [];
+  for (let bi = 0; bi < (p.bars || []).length; bi++) {
+    const bd = p.bars[bi];
+    const J1 = p.joints[bd.j1], J2 = p.joints[bd.j2];
+    if (!J1 || !J2) continue;
+    const horiz = Math.abs(J1.y - J2.y) <= Math.abs(J1.x - J2.x);
+    if (horiz) {
+      const jy = nearIdx(YG, (J1.y + J2.y) / 2);
+      const xa = Math.min(J1.x, J2.x) - g.tol, xb = Math.max(J1.x, J2.x) + g.tol;
+      const cols = [];
+      for (let i = 0; i < XG.length; i++) if (XG[i] >= xa && XG[i] <= xb) cols.push(i);
+      if (cols.length >= 2) barDefs.push({ def: bd, axis: 0, jy, cols });
+    } else {
+      const jx = nearIdx(XG, (J1.x + J2.x) / 2);
+      const ya = Math.min(J1.y, J2.y) - g.tol, yb = Math.max(J1.y, J2.y) + g.tol;
+      const rows = [];
+      for (let j = 0; j < YG.length; j++) if (YG[j] >= ya && YG[j] <= yb) rows.push(j);
+      if (rows.length >= 2) barDefs.push({ def: bd, axis: 1, jx, rows });
+    }
+  }
+  // bar nodes per column: list of {bar, k, iy(or grid pos), x, y}
+  const colBarNodes = Array.from({ length: XG.length }, () => []);
+  barDefs.forEach((B, bIdx) => {
+    if (B.axis === 0) {
+      B.cols.forEach((ix, k) => colBarNodes[ix].push({ bIdx, k, x: XG[ix], y: YG[B.jy], gi: ix, gj: B.jy }));
+    } else {
+      B.rows.forEach((jy, k) => colBarNodes[B.jx].push({ bIdx, k, x: XG[B.jx], y: YG[jy], gi: B.jx, gj: jy }));
+    }
+  });
+
+  // ---- node numbering (column-major, concrete then bar nodes per column) ----
+  const nodeId = new Int32Array((nxg + 1) * (nyg + 1)).fill(-1);
+  const Xa = [], Ya = [], isBar = [];
+  const barNodeId = barDefs.map(B => new Int32Array(B.axis === 0 ? B.cols.length : B.rows.length).fill(-1));
+  let nn = 0;
+  for (let i = 0; i <= nxg; i++) {
+    for (let j = 0; j <= nyg; j++) {
+      if (act[gid(i, j)]) { nodeId[gid(i, j)] = nn++; Xa.push(XG[i]); Ya.push(YG[j]); isBar.push(0); }
+    }
+    for (const bn of colBarNodes[i]) {
+      barNodeId[bn.bIdx][bn.k] = nn++;
+      Xa.push(bn.x); Ya.push(bn.y); isBar.push(1);
+    }
+  }
+  const nNodes = nn;
+  const X = Float64Array.from(Xa), Y = Float64Array.from(Ya);
+
+  // ---- quads ----
+  const quads = [], qMat = [], qThk = [], qHel = [], qDx = [], qDy = [];
+  for (let i = 0; i < nxg; i++) for (let j = 0; j < nyg; j++) {
+    const m = cellMat[i * nyg + j];
+    if (m < 0) continue;
+    quads.push([nodeId[gid(i, j)], nodeId[gid(i + 1, j)], nodeId[gid(i + 1, j + 1)], nodeId[gid(i, j + 1)]]);
+    qMat.push(m);
+    qThk.push(cellThk[i * nyg + j]);
+    const dx = XG[i + 1] - XG[i], dy = YG[j + 1] - YG[j];
+    qHel.push(Math.sqrt(dx * dy)); qDx.push(dx); qDy.push(dy);
+  }
+
+  // ---- bar elements + bond springs ----
+  const bars = [], springs = [];
+  barDefs.forEach((B, bIdx) => {
+    const d = B.def;
+    const A = d.nBars * Math.PI * d.dia * d.dia / 4;
+    const per = d.nBars * Math.PI * d.dia;
+    const ids = barNodeId[bIdx];
+    const coords = B.axis === 0 ? B.cols.map(ix => XG[ix]) : B.rows.map(jy => YG[jy]);
+    for (let k = 0; k < ids.length - 1; k++) {
+      bars.push({
+        n1: ids[k], n2: ids[k + 1], axis: B.axis, L: Math.abs(coords[k + 1] - coords[k]),
+        A, Es: d.Es, fy: d.fy, Eh: (d.hPct || 1) / 100 * d.Es, eu: (d.euPct != null ? d.euPct : 5) / 100
+      });
+    }
+    for (let k = 0; k < ids.length; k++) {
+      const gi = B.axis === 0 ? B.cols[k] : B.jx, gj = B.axis === 0 ? B.jy : B.rows[k];
+      const cn = nodeId[gid(gi, gj)];
+      if (cn < 0) continue; // bar node outside concrete
+      const Lt = (k === 0 ? Math.abs(coords[1] - coords[0]) / 2 :
+        k === ids.length - 1 ? Math.abs(coords[k] - coords[k - 1]) / 2 :
+          (Math.abs(coords[k + 1] - coords[k]) + Math.abs(coords[k] - coords[k - 1])) / 2);
+      springs.push({ nb: ids[k], nc: cn, per, Lt, axis: B.axis });
+    }
+  });
+
+  // ---- supports ----
+  const fixed = [];
+  const nearestActive = (x, y) => {
+    let best = -1, bd = Infinity;
+    for (let n = 0; n < nNodes; n++) {
+      if (isBar[n]) continue;
+      const d = (X[n] - x) ** 2 + (Y[n] - y) ** 2;
+      if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+  };
+  const nodesOnSeg = (J1, J2) => {
+    const out = [];
+    const dx = J2.x - J1.x, dy = J2.y - J1.y, LL = Math.hypot(dx, dy);
+    if (LL < 1e-9) return out;
+    for (let n = 0; n < nNodes; n++) {
+      if (isBar[n]) continue;
+      const t = ((X[n] - J1.x) * dx + (Y[n] - J1.y) * dy) / (LL * LL);
+      if (t < -1e-6 || t > 1 + 1e-6) continue;
+      const px = J1.x + t * dx, py = J1.y + t * dy;
+      if (Math.hypot(X[n] - px, Y[n] - py) < 1.0) out.push({ n, t });
+    }
+    out.sort((a, b) => a.t - b.t);
+    return out;
+  };
+  for (const s of (p.supports || [])) {
+    let nodes = [];
+    if (s.type === 'joint') {
+      const J = p.joints[s.a]; if (!J) continue;
+      const n = nearestActive(J.x, J.y); if (n >= 0) nodes = [n];
+    } else {
+      const J1 = p.joints[s.a], J2 = p.joints[s.b]; if (!J1 || !J2) continue;
+      nodes = nodesOnSeg(J1, J2).map(o => o.n);
+    }
+    for (const n of nodes) {
+      if (s.fx) fixed.push(2 * n);
+      if (s.fy) fixed.push(2 * n + 1);
+    }
+  }
+
+  // ---- loads (reference vector, N) ----
+  const F = new Float64Array(2 * nNodes);
+  for (const ld of (p.loads || [])) {
+    const dof = ld.dir === 'x' ? 0 : 1;
+    if (ld.type === 'joint') {
+      const J = p.joints[ld.a]; if (!J) continue;
+      const n = nearestActive(J.x, J.y);
+      if (n >= 0) F[2 * n + dof] += ld.val * 1000; // kN -> N, sign kept
+    } else {
+      const J1 = p.joints[ld.a], J2 = p.joints[ld.b]; if (!J1 || !J2) continue;
+      const seg = nodesOnSeg(J1, J2);
+      if (seg.length < 2) continue;
+      const LL = Math.hypot(J2.x - J1.x, J2.y - J1.y);
+      const q = ld.val; // kN/m == N/mm, sign kept
+      for (let k = 0; k < seg.length; k++) {
+        const tPrev = k === 0 ? seg[0].t : seg[k - 1].t;
+        const tNext = k === seg.length - 1 ? seg[k].t : seg[k + 1].t;
+        const trib = ((seg[k].t - tPrev) / 2 + (tNext - seg[k].t) / 2) * LL;
+        F[2 * seg[k].n + dof] += q * trib;
+      }
+    }
+  }
+  // self weight
+  if (p.selfWeight) {
+    for (let e = 0; e < quads.length; e++) {
+      const w = 24e-6 * qThk[e] * qDx[e] * qDy[e] / 4; // 24 kN/m3
+      for (const n of quads[e]) F[2 * n + 1] -= w;
+    }
+  }
+
+  // ---- half bandwidth ----
+  let hb = 0;
+  const upd = (a, b2) => { hb = Math.max(hb, Math.abs(2 * a - 2 * b2) + 1); };
+  for (const q of quads) for (let i = 0; i < 4; i++) for (let j = i; j < 4; j++) upd(q[i], q[j]);
+  for (const bel of bars) upd(bel.n1, bel.n2);
+  for (const s of springs) upd(s.nb, s.nc);
+
+  // average cell size (for crack marker scale)
+  let adx = 0, ady = 0;
+  for (let e = 0; e < quads.length; e++) { adx += qDx[e]; ady += qDy[e]; }
+  adx = quads.length ? adx / quads.length : 50; ady = quads.length ? ady / quads.length : 50;
+
+  if (!quads.length) throw new Error('No finite elements generated — check macro-elements and joints.');
+  if (!fixed.length) throw new Error('No supports defined — structure is unconstrained.');
+
+  return {
+    p, geom: g, nNodes, X, Y, isBar: Uint8Array.from(isBar),
+    quads, qMat, qThk, qHel, qDx, qDy, bars, springs, fixed, F, hb,
+    dx: adx, dy: ady
+  };
+}
+
+// ---------- Q4 plane stress ----------
+const GP = [-1 / Math.sqrt(3), 1 / Math.sqrt(3)];
+function q4B(xe, ye, xi, eta) {
+  const dN = [
+    [-(1 - eta) / 4, (1 - eta) / 4, (1 + eta) / 4, -(1 + eta) / 4],
+    [-(1 - xi) / 4, -(1 + xi) / 4, (1 + xi) / 4, (1 - xi) / 4]
+  ];
+  let J00 = 0, J01 = 0, J10 = 0, J11 = 0;
+  for (let a = 0; a < 4; a++) {
+    J00 += dN[0][a] * xe[a]; J01 += dN[0][a] * ye[a];
+    J10 += dN[1][a] * xe[a]; J11 += dN[1][a] * ye[a];
+  }
+  const detJ = J00 * J11 - J01 * J10;
+  const i00 = J11 / detJ, i01 = -J01 / detJ, i10 = -J10 / detJ, i11 = J00 / detJ;
+  const B = new Float64Array(24);
+  for (let a = 0; a < 4; a++) {
+    const dNx = i00 * dN[0][a] + i01 * dN[1][a];
+    const dNy = i10 * dN[0][a] + i11 * dN[1][a];
+    B[0 * 8 + 2 * a] = dNx;
+    B[1 * 8 + 2 * a + 1] = dNy;
+    B[2 * 8 + 2 * a] = dNy;
+    B[2 * 8 + 2 * a + 1] = dNx;
+  }
+  return { B, detJ };
+}
+function q4Stiffness(xe, ye, D, t) {
+  const K = new Float64Array(64);
+  for (const xi of GP) for (const eta of GP) {
+    const { B, detJ } = q4B(xe, ye, xi, eta);
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+      let s = 0;
+      for (let a = 0; a < 3; a++) for (let c = 0; c < 3; c++) s += B[a * 8 + i] * D[a * 3 + c] * B[c * 8 + j];
+      K[i * 8 + j] += s * detJ * t;
+    }
+  }
+  return K;
+}
+function Dmat(E, nu) {
+  const c = E / (1 - nu * nu);
+  return [c, c * nu, 0, c * nu, c, 0, 0, 0, c * (1 - nu) / 2];
+}
+
+// ---------- material laws ----------
+function concreteDamage(eps, mat, hel) {
+  const [exx, eyy, gxy] = eps;
+  const cm = (exx + eyy) / 2, rr = Math.sqrt(((exx - eyy) / 2) ** 2 + (gxy / 2) ** 2);
+  const e1 = cm + rr, e2 = cm - rr;
+  const ang = 0.5 * Math.atan2(gxy, exx - eyy);
+  const e0 = mat.ft / mat.E;
+  let ef = e0 + mat.Gf / (mat.ft * hel);
+  if (ef < 1.2 * e0) ef = 1.2 * e0;
+  let dt = 0, cracked = 0, cw = 0;
+  if (e1 > e0) {
+    dt = 1 - (e0 / e1) * Math.exp(-(e1 - e0) / (ef - e0));
+    cracked = 1;
+    cw = (e1 - e0) * hel;
+  }
+  let dc = 0, crushed = 0;
+  const ec = -Math.min(e2, 0);
+  const ec0 = 2 * mat.fc / mat.E;
+  const ecu = mat.ecu || 0.0035;
+  const RES = 0.2;
+  if (ec > 1e-12) {
+    let sig;
+    if (ec <= ec0) { const x = ec / ec0; sig = mat.fc * (2 * x - x * x); }
+    else if (ec <= ecu) sig = mat.fc * (1 - (1 - RES) * (ec - ec0) / (ecu - ec0));
+    else { sig = RES * mat.fc; crushed = 1; }
+    dc = 1 - sig / (mat.E * ec);
+    if (dc < 0) dc = 0;
+  }
+  let d = Math.max(dt, dc);
+  if (d > 0.998) d = 0.998;
+  return { d, ang, cracked, crushed, e1, e2, cw };
+}
+function steelSecant(eps, bar, ruptured) {
+  const ey = bar.fy / bar.Es, ae = Math.abs(eps);
+  const eu = bar.eu || 0.05;
+  if (ruptured || ae >= eu) return bar.Es * 1e-6;
+  if (ae <= ey || ae < 1e-12) return bar.Es;
+  const sig = bar.fy + bar.Eh * (ae - ey);
+  return sig / ae;
+}
+function bondTau(s, bond) {
+  const tf = (bond.tauF != null) ? bond.tauF : 0.4 * bond.tauMax;
+  const s2 = bond.s2 || 2, s3 = Math.max(bond.s3 || 6, s2 + 0.01);
+  if (s <= bond.s1) return bond.tauMax * Math.pow(s / bond.s1, bond.alpha);
+  if (s <= s2) return bond.tauMax;
+  if (s <= s3) return bond.tauMax - (bond.tauMax - tf) * (s - s2) / (s3 - s2);
+  return tf;
+}
+function bondSecant(slip, bond, per, Lt) {
+  if (bond.perfect) return 1e9;
+  const s = Math.max(Math.abs(slip), 0.005);
+  return bondTau(s, bond) * per * Lt / s;
+}
+
+// ---------- assembly + solve ----------
+function assembleSolve(model, lambda, secants) {
+  const nd = 2 * model.nNodes, hb = model.hb, w = hb + 1;
+  const B = new Float64Array(nd * w);
+  const add = (r, c, v) => {
+    if (r < c) { const t = r; r = c; c = t; }
+    B[r * w + (r - c)] += v;
+  };
+  const mats = model.p.materials;
+  for (let e = 0; e < model.quads.length; e++) {
+    const q = model.quads[e];
+    const xe = q.map(n => model.X[n]), ye = q.map(n => model.Y[n]);
+    const mat = mats[model.qMat[e]];
+    const D = Dmat(mat.E * (1 - secants.dmg[e]), mat.nu);
+    const Ke = q4Stiffness(xe, ye, D, model.qThk[e]);
+    const dofs = [];
+    for (const n of q) dofs.push(2 * n, 2 * n + 1);
+    for (let i = 0; i < 8; i++) for (let j = 0; j <= i; j++) add(dofs[i], dofs[j], Ke[i * 8 + j]);
+  }
+  for (let ib = 0; ib < model.bars.length; ib++) {
+    const bel = model.bars[ib];
+    const k = secants.barE[ib] * bel.A / bel.L;
+    const d = bel.axis; // 0=x, 1=y
+    add(2 * bel.n1 + d, 2 * bel.n1 + d, k);
+    add(2 * bel.n2 + d, 2 * bel.n2 + d, k);
+    add(Math.max(2 * bel.n1 + d, 2 * bel.n2 + d), Math.min(2 * bel.n1 + d, 2 * bel.n2 + d), -k);
+  }
+  for (let is = 0; is < model.springs.length; is++) {
+    const s = model.springs[is];
+    const kb = secants.bondK[is], kd = 1e7;
+    const a = s.axis, o = 1 - s.axis;
+    const pair = (dof, kk) => {
+      add(2 * s.nb + dof, 2 * s.nb + dof, kk);
+      add(2 * s.nc + dof, 2 * s.nc + dof, kk);
+      add(Math.max(2 * s.nb + dof, 2 * s.nc + dof), Math.min(2 * s.nb + dof, 2 * s.nc + dof), -kk);
+    };
+    pair(a, kb); pair(o, kd);
+  }
+  for (let n = 0; n < model.nNodes; n++) {
+    if (B[(2 * n) * w] === 0) B[(2 * n) * w] = 1;
+    if (B[(2 * n + 1) * w] === 0) B[(2 * n + 1) * w] = 1;
+  }
+  for (const dof of model.fixed) B[dof * w] += 1e15;
+  const f = new Float64Array(nd);
+  for (let i = 0; i < nd; i++) f[i] = lambda * model.F[i];
+  bandFactor(B, nd, hb);
+  return bandSolve(B, nd, hb, f);
+}
+
+function quadStrain(model, e, u) {
+  const q = model.quads[e];
+  const xe = q.map(n => model.X[n]), ye = q.map(n => model.Y[n]);
+  const { B } = q4B(xe, ye, 0, 0);
+  const ue = [];
+  for (const n of q) ue.push(u[2 * n], u[2 * n + 1]);
+  const eps = [0, 0, 0];
+  for (let a = 0; a < 3; a++) for (let i = 0; i < 8; i++) eps[a] += B[a * 8 + i] * ue[i];
+  return eps;
+}
+function barStrain(model, ib, u) {
+  const bel = model.bars[ib], d = bel.axis;
+  return (u[2 * bel.n2 + d] - u[2 * bel.n1 + d]) / bel.L * Math.sign(
+    d === 0 ? model.X[bel.n2] - model.X[bel.n1] : model.Y[bel.n2] - model.Y[bel.n1]);
+}
+
+// ---------- nonlinear driver ----------
+function runAnalysis(p, log) {
+  const model = buildModel(p);
+  const nQ = model.quads.length;
+  const state = {
+    dmg: new Float64Array(nQ),
+    crackAng: new Float64Array(nQ).fill(NaN),
+    cracked: new Uint8Array(nQ),
+    crushed: new Uint8Array(nQ),
+    barRupt: new Uint8Array(model.bars.length),
+    events: { firstCrack: 0, firstYield: 0, firstCrush: 0, firstRupt: 0 }
+  };
+  const results = [];
+  const nSteps = p.run.linear ? 1 : p.run.steps;
+  let u = null;
+  const secants = {
+    dmg: new Float64Array(nQ),
+    barE: Float64Array.from(model.bars.map(b => b.Es)),
+    bondK: new Float64Array(model.springs.length)
+  };
+  for (let is = 0; is < model.springs.length; is++) {
+    const s = model.springs[is];
+    secants.bondK[is] = bondSecant(0, p.bond, s.per, s.Lt);
+  }
+  const mats = p.materials;
+
+  for (let step = 1; step <= nSteps; step++) {
+    const lambda = step / nSteps;
+    let conv = false, it = 0;
+    for (it = 1; it <= (p.run.linear ? 1 : p.run.maxIter); it++) {
+      u = assembleSolve(model, lambda, secants);
+      if (p.run.linear) { conv = true; break; }
+      let maxChange = 0;
+      for (let e = 0; e < nQ; e++) {
+        const eps = quadStrain(model, e, u);
+        const r = concreteDamage(eps, mats[model.qMat[e]], model.qHel[e]);
+        const dNew = Math.max(state.dmg[e], r.d);
+        maxChange = Math.max(maxChange, Math.abs(dNew - secants.dmg[e]));
+        secants.dmg[e] = dNew;
+        if (r.cracked && !state.cracked[e]) state.crackAng[e] = r.ang;
+      }
+      for (let ib = 0; ib < model.bars.length; ib++) {
+        const bel = model.bars[ib];
+        const eps = barStrain(model, ib, u);
+        if (Math.abs(eps) >= bel.eu) state.barRupt[ib] = 1;
+        const Enew = steelSecant(eps, bel, state.barRupt[ib]);
+        maxChange = Math.max(maxChange, Math.abs(Enew - secants.barE[ib]) / bel.Es);
+        secants.barE[ib] = Enew;
+      }
+      for (let is2 = 0; is2 < model.springs.length; is2++) {
+        const s = model.springs[is2];
+        const slip = u[2 * s.nb + s.axis] - u[2 * s.nc + s.axis];
+        secants.bondK[is2] = bondSecant(slip, p.bond, s.per, s.Lt);
+      }
+      if (maxChange < p.run.tol) { conv = true; break; }
+    }
+    // commit
+    for (let e = 0; e < nQ; e++) {
+      if (secants.dmg[e] > state.dmg[e]) state.dmg[e] = secants.dmg[e];
+      const eps = quadStrain(model, e, u);
+      const r = concreteDamage(eps, mats[model.qMat[e]], model.qHel[e]);
+      if (r.cracked) state.cracked[e] = 1;
+      if (r.crushed) state.crushed[e] = 1;
+    }
+    const res = collectResults(model, state, u, p, lambda, secants);
+    res.step = step; res.lambda = lambda; res.iters = it; res.converged = conv;
+    results.push(res);
+    if (log) log(`Step ${step}/${nSteps}  λ=${lambda.toFixed(2)}  iters=${it}${conv ? '' : ' (max iters reached)'}  max defl=${res.maxDefl.toFixed(3)} mm  w_max=${res.maxCW.toFixed(3)} mm`);
+    if (log && !p.run.linear) {
+      const ev = state.events;
+      if (!ev.firstCrack && res.nCracked > 0) { ev.firstCrack = step; log(`  ▸ FIRST CRACKING at λ=${lambda.toFixed(2)}`); }
+      if (!ev.firstYield && res.nYield > 0) { ev.firstYield = step; log(`  ▸ STEEL YIELDING starts at λ=${lambda.toFixed(2)} (σs ≥ fy)`); }
+      if (!ev.firstCrush && res.nCrushed > 0) { ev.firstCrush = step; log(`  ▸ CONCRETE CRUSHING starts at λ=${lambda.toFixed(2)} (εc ≥ εcu)`); }
+      if (!ev.firstRupt && res.nRupt > 0) { ev.firstRupt = step; log(`  ▸ BAR RUPTURE at λ=${lambda.toFixed(2)} (εs ≥ εu)`); }
+    }
+    if (!p.run.linear && step > 1) {
+      const prev = results[results.length - 2];
+      const span = Math.max(...model.X) - Math.min(...model.X);
+      const blowup = res.maxDefl > 3 * Math.max(prev.maxDefl, 1e-6) && res.maxDefl > span / 100;
+      const rupture = res.nRupt > 0 && (prev.nRupt || 0) === 0;
+      const broken = !isFinite(res.maxDefl);
+      if (blowup || broken || rupture) {
+        let mode = [];
+        if (res.nRupt > 0) mode.push('reinforcement rupture');
+        if (res.nYield > 0 && res.nCrushed > 0) mode.push('flexural failure (steel yielding + concrete crushing)');
+        else if (res.nCrushed > 0) mode.push('concrete crushing (brittle, over-reinforced/compression)');
+        else if (res.nYield > 0) mode.push('flexural mechanism (steel yielding + wide cracking)');
+        if (!mode.length) mode.push('loss of equilibrium');
+        if (log) log(`  ■ STRUCTURAL FAILURE detected at λ=${lambda.toFixed(2)} — ultimate load ≈ ${(results[results.length - 2].lambda * 100).toFixed(0)}–${(lambda * 100).toFixed(0)}% of applied. Mode: ${mode.join(' + ')}.`);
+        res.failed = true; res.failureMode = mode.join(' + ');
+        break;
+      }
+    }
+  }
+  return { model, results };
+}
+
+function collectResults(model, state, u, p, lambda, secants) {
+  const nQ = model.quads.length, mats = p.materials;
+  const el = {
+    sxx: new Float64Array(nQ), syy: new Float64Array(nQ), sxy: new Float64Array(nQ),
+    s1: new Float64Array(nQ), s2: new Float64Array(nQ),
+    exx: new Float64Array(nQ), eyy: new Float64Array(nQ), e1: new Float64Array(nQ),
+    dmg: new Float64Array(nQ), ang: new Float64Array(nQ),
+    cracked: new Uint8Array(nQ), crushed: new Uint8Array(nQ),
+    cw: new Float64Array(nQ)
+  };
+  for (let e = 0; e < nQ; e++) {
+    const eps = quadStrain(model, e, u);
+    const mat = mats[model.qMat[e]];
+    const d = state.dmg[e];
+    const D = Dmat(mat.E * (1 - d), mat.nu);
+    const s = [D[0] * eps[0] + D[1] * eps[1], D[3] * eps[0] + D[4] * eps[1], D[8] * eps[2]];
+    el.sxx[e] = s[0]; el.syy[e] = s[1]; el.sxy[e] = s[2];
+    const cm = (s[0] + s[1]) / 2, rr = Math.sqrt(((s[0] - s[1]) / 2) ** 2 + s[2] ** 2);
+    el.s1[e] = cm + rr; el.s2[e] = cm - rr;
+    el.exx[e] = eps[0]; el.eyy[e] = eps[1];
+    const cme = (eps[0] + eps[1]) / 2, rre = Math.sqrt(((eps[0] - eps[1]) / 2) ** 2 + (eps[2] / 2) ** 2);
+    el.e1[e] = cme + rre;
+    el.dmg[e] = d;
+    el.ang[e] = state.crackAng[e];
+    el.cracked[e] = d > 0.02 && !isNaN(state.crackAng[e]) ? 1 : 0;
+    const rD = concreteDamage(eps, mat, model.qHel[e]);
+    el.cw[e] = el.cracked[e] ? rD.cw : 0;
+    el.crushed[e] = state.crushed[e];
+  }
+  const bars = model.bars.map((bel, ib) => {
+    const eps = barStrain(model, ib, u);
+    const rupt = state.barRupt[ib];
+    const Esec = secants ? secants.barE[ib] : bel.Es;
+    return { eps, sig: rupt ? 0 : Esec * eps, yielded: Math.abs(eps) > bel.fy / bel.Es ? 1 : 0, ruptured: rupt };
+  });
+  const springs = model.springs.map((s, is2) => {
+    const slip = u[2 * s.nb + s.axis] - u[2 * s.nc + s.axis];
+    const K = secants ? secants.bondK[is2] : 0;
+    return { slip, tau: s.per * s.Lt > 0 ? K * slip / (s.per * s.Lt) : 0 };
+  });
+  let maxDefl = 0, maxSteel = 0, maxSlip = 0, maxCW = 0;
+  for (let n = 0; n < model.nNodes; n++) maxDefl = Math.max(maxDefl, Math.abs(u[2 * n + 1]));
+  for (const b of bars) maxSteel = Math.max(maxSteel, Math.abs(b.sig));
+  for (const s of springs) maxSlip = Math.max(maxSlip, Math.abs(s.slip));
+  for (let e = 0; e < nQ; e++) maxCW = Math.max(maxCW, el.cw[e]);
+  let nCracked = 0, nCrushed = 0, nYield = 0, nRupt = 0;
+  for (let e = 0; e < nQ; e++) { if (el.cracked[e]) nCracked++; if (el.crushed[e]) nCrushed++; }
+  for (const b of bars) { if (b.yielded) nYield++; if (b.ruptured) nRupt++; }
+  return { u: Float64Array.from(u), el, bars, springs, maxDefl, maxSteel, maxSlip, maxCW, nCracked, nCrushed, nYield, nRupt };
+}
+
+if (typeof module !== "undefined") module.exports = { buildGeometry, buildModel, runAnalysis, concreteDamage, bondTau };
+
+</script>
+<script>
+/* ============================================================
+   RC-FEA 2D — ATENA-style UI v2 (general topology)
+   ============================================================ */
+"use strict";
+
+// ------------------- default model: SS beam -------------------
+const App = {
+  params: {
+    title: "RC beam on steel plates",
+    materials: [
+      { name: 'Concrete C30/37', E: 32000, nu: 0.2, fc: 38, ft: 2.9, Gf: 0.07, ecu: 0.0035 },
+      { name: 'Steel plate (elastic)', E: 200000, nu: 0.3, fc: 1000, ft: 1000, Gf: 10, ecu: 0.1 }
+    ],
+    joints: [
+      { x: 0, y: 0 }, { x: 3000, y: 0 }, { x: 3000, y: 500 }, { x: 0, y: 500 },      // 1-4  beam corners
+      { x: 0, y: 40 }, { x: 3000, y: 40 },                                            // 5,6  bottom rebar
+      { x: 0, y: 460 }, { x: 3000, y: 460 },                                          // 7,8  top rebar
+      { x: 0, y: -40 }, { x: 150, y: -40 }, { x: 150, y: 0 },                         // 9-11 left bearing plate
+      { x: 2850, y: -40 }, { x: 3000, y: -40 }, { x: 2850, y: 0 },                    // 12-14 right bearing plate
+      { x: 1425, y: 500 }, { x: 1575, y: 500 }, { x: 1425, y: 540 }, { x: 1575, y: 540 } // 15-18 loading plate
+    ],
+    lines: [
+      { a: 0, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 3 }, { a: 3, b: 0 },  // beam outline
+      { a: 4, b: 5 }, { a: 6, b: 7 },                                   // reinforcement lines
+      { a: 8, b: 9 }, { a: 11, b: 12 },                                 // plate bottoms (supports)
+      { a: 16, b: 17 }                                                  // load plate top
+    ],
+    macros: [
+      { jl: [0, 1, 2, 3], mat: 0, b: 200 },        // concrete beam
+      { jl: [8, 9, 10, 0], mat: 1, b: 200 },       // left bearing plate 150×40
+      { jl: [11, 12, 1, 13], mat: 1, b: 200 },     // right bearing plate 150×40
+      { jl: [14, 15, 16, 17], mat: 1, b: 200 }     // loading plate 150×40
+    ],
+    bars: [
+      { j1: 4, j2: 5, nBars: 2, dia: 16, Es: 200000, fy: 500, hPct: 1, euPct: 5 },   // bottom 2Ø16
+      { j1: 6, j2: 7, nBars: 2, dia: 12, Es: 200000, fy: 500, hPct: 1, euPct: 5 }    // top 2Ø12
+    ],
+    bond: { perfect: false, tauMax: 12.3, s1: 1.0, alpha: 0.4, s2: 2, s3: 6, tauF: 4.9 },
+    supports: [
+      { type: 'line', a: 8, b: 9, fx: false, fy: true },    // left plate bottom: rollers
+      { type: 'joint', a: 8, b: 0, fx: true, fy: true },    // + pin (X) at one corner
+      { type: 'line', a: 11, b: 12, fx: false, fy: true }   // right plate bottom: rollers
+    ],
+    loads: [{ type: 'line', a: 16, b: 17, dir: 'y', val: -800 }], // 800 kN/m × 0.15 m = 120 kN
+    meshSize: 50,
+    selfWeight: false,
+    run: { steps: 10, maxIter: 30, tol: 5e-3, linear: false },
+    monitors: [{ x: 1500, y: 0, dir: 'uy', name: 'M1 midspan' }]
+  },
+  model: null, results: null,
+  view: { mode: 'model', quantity: 'uy', step: 0, defScale: 'auto', showMesh: true, showCracks: true, showRebar: true },
+  cam: { scale: 0.2, ox: 60, oy: 0 },
+  selected: 'geometry-joints'
+};
+
+function $(id) { return document.getElementById(id); }
+function logMsg(s, cls) {
+  const d = document.createElement('div');
+  d.textContent = s; if (cls) d.className = cls;
+  $('log').appendChild(d); $('log').scrollTop = $('log').scrollHeight;
+}
+
+// ------------------- tree -------------------
+const TREE = [
+  { id: 'general', label: 'General data', icon: '📋' },
+  {
+    label: 'Materials', icon: '🧱', bold: true, children: [
+      { id: 'materials', label: 'Concrete materials', icon: '▦' },
+      { id: 'bars-mat', label: 'Reinforcement (bars)', icon: '〰' },
+      { id: 'bond', label: 'Bond (bar–concrete)', icon: '⇆' }]
+  },
+  {
+    label: 'Topology', icon: '🛡', bold: true, children: [
+      { id: 'geometry-joints', label: 'Joints', icon: '•' },
+      { id: 'geometry-lines', label: 'Lines', icon: '╱' },
+      { id: 'geometry-macros', label: 'Macro-elements', icon: '▭' },
+      { id: 'geometry-bars', label: 'Bar reinforcement', icon: '〰' },
+      { id: 'mesh', label: 'Mesh', icon: '▦' }]
+  },
+  {
+    label: 'Loads and supports', icon: '⬇', bold: true, children: [
+      { id: 'supports', label: 'Supports', icon: '◣' },
+      { id: 'loads', label: 'Load cases', icon: '↓' }]
+  },
+  {
+    label: 'Run', icon: '▶', bold: true, children: [
+      { id: 'analysis', label: 'Analysis parameters', icon: '⚙' },
+      { id: 'monitors', label: 'Monitoring points', icon: '⊕' },
+      { id: 'check', label: 'Check data & RUN', icon: '▶' }]
+  },
+  {
+    label: 'Results', icon: '📈', bold: true, children: [
+      { id: 'results', label: 'Post-processing', icon: '🌈' },
+      { id: 'chart', label: 'Load–deflection chart', icon: '📉' },
+      { id: 'summary', label: 'Summary table', icon: '📄' }]
+  }
+];
+function buildTree() {
+  const root = $('tree'); root.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'tree-root'; title.textContent = App.params.title;
+  root.appendChild(title);
+  const walk = (items, depth) => {
+    for (const it of items) {
+      const d = document.createElement('div');
+      d.className = 'tree-item' + (it.bold ? ' tree-bold' : '');
+      d.style.paddingLeft = (10 + depth * 16) + 'px';
+      d.innerHTML = `<span class="ticon">${it.icon}</span>${it.label}`;
+      if (it.id) { d.dataset.id = it.id; d.onclick = () => selectItem(it.id); }
+      root.appendChild(d);
+      if (it.children) walk(it.children, depth + 1);
+    }
+  };
+  walk(TREE, 0);
+}
+function selectItem(id) {
+  App.selected = id;
+  document.querySelectorAll('.tree-item').forEach(e => e.classList.toggle('sel', e.dataset.id === id));
+  renderForm();
+  updateMatPlot();
+  if (id === 'results' && App.results) App.view.mode = 'results';
+  else if (id === 'chart' && App.results) App.view.mode = 'chart';
+  else if (id !== 'summary') App.view.mode = 'model';
+  draw();
+}
+
+// ------------------- forms -------------------
+function fldNum(label, value, id, step, unit) {
+  return `<label class="frow"><span>${label}</span><input type="number" id="${id}" value="${value}" step="${step || 'any'}"><em>${unit || ''}</em></label>`;
+}
+const T = t => `<div class="ftitle">${t}</div>`;
+
+function tableHead(cols) { return `<tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr>`; }
+function tin(i, k, v, wpx) { return `<td><input data-i="${i}" data-k="${k}" type="number" value="${v}"${wpx ? ` style="width:${wpx}px"` : ''}></td>`; }
+function tcb(i, k, v) { return `<td style="text-align:center"><input data-i="${i}" data-k="${k}" type="checkbox" ${v ? 'checked' : ''}></td>`; }
+function tdel(i) { return `<td><button class="btn" data-del="${i}">✕</button></td>`; }
+function jOpts(sel) {
+  return App.params.joints.map((J, i) => `<option value="${i}" ${i === sel ? 'selected' : ''}>${i + 1} (${J.x}, ${J.y})</option>`).join('');
+}
+
+function renderForm() {
+  const p = App.params, host = $('form-host'), id = App.selected;
+  let h = '';
+  if (id === 'general') {
+    h = T('General data') +
+      `<label class="frow"><span>Project title</span><input type="text" id="f-title" value="${p.title}"><em></em></label>` +
+      `<label class="frow"><span>Self-weight (24 kN/m³, all macros)</span><input type="checkbox" id="f-sw" ${p.selfWeight ? 'checked' : ''}><em></em></label>` +
+      `<div class="fnote">Units: mm, N, MPa, kN. Workflow: define <b>Joints</b> → <b>Lines</b> → <b>Macro-elements</b> (rectangles with a material and thickness) → <b>Bar reinforcement</b> → <b>Supports/Loads</b> on any joints or lines → <b>Run</b>.</div>`;
+  } else if (id === 'materials') {
+    h = T('Concrete-type materials') + `<table class="rtable" id="mattable">` +
+      tableHead(['Name', 'E [MPa]', 'ν', 'fc [MPa]', 'ft [MPa]', 'Gf [N/mm]', 'εcu', '']);
+    p.materials.forEach((m, i) => {
+      h += `<tr><td><input data-i="${i}" data-k="name" type="text" value="${m.name}" style="width:120px"></td>` +
+        tin(i, 'E', m.E, 70) + tin(i, 'nu', m.nu, 45) + tin(i, 'fc', m.fc, 50) + tin(i, 'ft', m.ft, 45) +
+        tin(i, 'Gf', m.Gf, 50) + tin(i, 'ecu', m.ecu, 60) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addmat">＋ Add material</button>
+      <label class="frow" style="margin-top:6px"><span>Plot σ–ε diagram of material</span><select id="f-matplot-sel">${p.materials.map((m, i) => `<option value="${i}">${i + 1}: ${m.name}</option>`).join('')}</select><em>→ shown in Messages panel</em></label>
+      <div class="fnote">Compression: parabola to fc at ε₀=2fc/E, linear softening to 0.2fc at εcu (crushing). Tension: linear to ft, exponential softening regularized by Gf and mesh size h.</div>`;
+  } else if (id === 'bars-mat' || id === 'geometry-bars') {
+    h = T('Bar reinforcement (truss + bond)') + `<table class="rtable" id="bartable">` +
+      tableHead(['Joint 1', 'Joint 2', 'n bars', 'Ø [mm]', 'Es [MPa]', 'fy [MPa]', 'hard. [%]', 'εu [%]', '']);
+    p.bars.forEach((b2, i) => {
+      h += `<tr><td><select data-i="${i}" data-k="j1">${jOpts(b2.j1)}</select></td>
+        <td><select data-i="${i}" data-k="j2">${jOpts(b2.j2)}</select></td>` +
+        tin(i, 'nBars', b2.nBars, 45) + tin(i, 'dia', b2.dia, 45) + tin(i, 'Es', b2.Es, 70) +
+        tin(i, 'fy', b2.fy, 50) + tin(i, 'hPct', b2.hPct, 45) + tin(i, 'euPct', b2.euPct, 45) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addbar">＋ Add bar (by joints)</button>
+      <label class="frow" style="margin-top:6px"><span>…or create bar from line</span>
+        <select id="f-barline">${p.lines.map((L, i) => `<option value="${i}">line ${i + 1}: ${L.a + 1}–${L.b + 1}</option>`).join('')}</select>
+        <button class="btn" id="f-addbarline">＋ Create</button></label>
+      <div class="fnote">A bar is a truss between two joints (points) — add joints first, or pick an existing line. Bars must be horizontal or vertical (snapped to the mesh). Bilinear σ–ε with hardening; rupture (σ→0) at εu. σ–ε diagram of bar 1 is shown in the Messages panel.</div>`;
+  } else if (id === 'bond') {
+    h = T('Bond bar–concrete (fib MC2010)') +
+      `<label class="frow"><span>Perfect bond</span><input type="checkbox" id="f-perfect" ${p.bond.perfect ? 'checked' : ''}><em></em></label>` +
+      fldNum('τmax', p.bond.tauMax, 'f-tau', 0.1, 'MPa') +
+      fldNum('s₁ (end of ascending)', p.bond.s1, 'f-s1', 0.1, 'mm') +
+      fldNum('s₂ (end of plateau)', p.bond.s2, 'f-s2', 0.1, 'mm') +
+      fldNum('s₃ (start of residual)', p.bond.s3, 'f-s3', 0.5, 'mm') +
+      fldNum('τf residual friction', p.bond.tauF, 'f-tauf', 0.1, 'MPa') +
+      fldNum('α (ascending exponent)', p.bond.alpha, 'f-alpha', 0.05, '') +
+      `<div class="fnote">τ–s diagram is shown in the Messages panel. τ=τmax(s/s₁)<sup>α</sup> → plateau → softening → residual τf (pull-out).</div>`;
+  } else if (id === 'geometry-joints') {
+    h = T('Joints (points)') + `<table class="rtable" id="jtable">` + tableHead(['#', 'X [mm]', 'Y [mm]', '']);
+    p.joints.forEach((J, i) => {
+      h += `<tr><td>${i + 1}</td>` + tin(i, 'x', J.x, 80) + tin(i, 'y', J.y, 80) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addjoint">＋ Add joint</button>
+      <div class="fnote">Joints define geometry corners, bar ends, support and load positions. Deleting a joint re-numbers the ones after it — update references in macros/bars/supports/loads.</div>`;
+  } else if (id === 'geometry-lines') {
+    h = T('Lines') + `<table class="rtable" id="ltable">` + tableHead(['#', 'Joint 1', 'Joint 2', '']);
+    p.lines.forEach((L, i) => {
+      h += `<tr><td>${i + 1}</td><td><select data-i="${i}" data-k="a">${jOpts(L.a)}</select></td>
+        <td><select data-i="${i}" data-k="b">${jOpts(L.b)}</select></td>` + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addline">＋ Add line</button>
+      <div class="fnote">Lines are for visualization and as targets for line supports / line loads.</div>`;
+  } else if (id === 'geometry-macros') {
+    h = T('Macro-elements (assign material)') + `<table class="rtable" id="metable">` +
+      tableHead(['#', 'Joint list (e.g. 1,2,3,4)', 'Material', 'Thickness b [mm]', '']);
+    p.macros.forEach((m, i) => {
+      h += `<tr><td>${i + 1}</td>
+        <td><input data-i="${i}" data-k="jl" type="text" value="${m.jl.map(j => j + 1).join(',')}" style="width:130px"></td>
+        <td><select data-i="${i}" data-k="mat">${p.materials.map((mm, k) => `<option value="${k}" ${k === m.mat ? 'selected' : ''}>${k + 1}: ${mm.name}</option>`).join('')}</select></td>` +
+        tin(i, 'b', m.b, 70) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addmacro">＋ Add macro-element</button>
+      <div class="fnote">Each macro-element is the rectangle bounding its joint list, meshed with the assigned material. Overlapping macros: the later one wins (e.g. bearing plates over slab).</div>`;
+  } else if (id === 'mesh') {
+    let info = '';
+    try {
+      const g = buildGeometry(p);
+      let nc = 0; for (const m of g.cellMat) if (m >= 0) nc++;
+      info = `Grid ${g.nxg}×${g.nyg} cells, ${nc} active finite elements.`;
+    } catch (e) { info = '⚠ ' + e.message; }
+    h = T('Mesh') + fldNum('Target element size h', p.meshSize, 'f-msize', 5, 'mm') +
+      `<div class="fnote">${info}<br>Grid lines pass through every joint coordinate; intervals are subdivided to ≈ h. Keep total elements ≤ ~3000 for fast runs. Softening is mesh-regularized via Gf.</div>`;
+  } else if (id === 'supports') {
+    h = T('Supports (any joints or lines, X/Y)') + `<table class="rtable" id="stable">` +
+      tableHead(['Type', 'Joint 1', 'Joint 2 (line)', 'Fix X', 'Fix Y', '']);
+    (p.supports || []).forEach((s, i) => {
+      h += `<tr><td><select data-i="${i}" data-k="type">
+          <option value="joint" ${s.type === 'joint' ? 'selected' : ''}>Joint</option>
+          <option value="line" ${s.type === 'line' ? 'selected' : ''}>Line</option></select></td>
+        <td><select data-i="${i}" data-k="a">${jOpts(s.a)}</select></td>
+        <td><select data-i="${i}" data-k="b" ${s.type === 'joint' ? 'disabled' : ''}>${jOpts(s.b)}</select></td>` +
+        tcb(i, 'fx', s.fx) + tcb(i, 'fy', s.fy) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addsupp">＋ Add support</button>
+      <div class="fnote">Joint support: constrains the nearest mesh node. Line support: constrains all mesh nodes on the segment between the two joints. Fix X and/or Y independently (pin = both, roller = one).</div>`;
+  } else if (id === 'loads') {
+    h = T('Load case LC1 (any joints or lines, X/Y)') + `<table class="rtable" id="ldtable">` +
+      tableHead(['Type', 'Joint 1', 'Joint 2 (line)', 'Direction', 'Value', '']);
+    (p.loads || []).forEach((l, i) => {
+      h += `<tr><td><select data-i="${i}" data-k="type">
+          <option value="joint" ${l.type === 'joint' ? 'selected' : ''}>Point force</option>
+          <option value="line" ${l.type === 'line' ? 'selected' : ''}>Line load</option></select></td>
+        <td><select data-i="${i}" data-k="a">${jOpts(l.a)}</select></td>
+        <td><select data-i="${i}" data-k="b" ${l.type === 'joint' ? 'disabled' : ''}>${jOpts(l.b)}</select></td>
+        <td><select data-i="${i}" data-k="dir">
+          <option value="x" ${l.dir === 'x' ? 'selected' : ''}>Global X</option>
+          <option value="y" ${l.dir === 'y' ? 'selected' : ''}>Global Y</option></select></td>` +
+        tin(i, 'val', l.val, 70) + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addload">＋ Add load</button>
+      <div class="fnote">Point force in kN, line load in kN/m. Sign convention: +X → right, +Y → up (use negative for downward/leftward). Total applied: ${totalLoadkN(1).toFixed(1)} kN (Σ|F|).</div>`;
+  } else if (id === 'analysis') {
+    h = T('Analysis parameters') +
+      `<label class="frow"><span>Linear elastic only</span><input type="checkbox" id="f-linear" ${p.run.linear ? 'checked' : ''}><em></em></label>` +
+      fldNum('Load steps', p.run.steps, 'f-steps', 1, '') +
+      fldNum('Max iterations / step', p.run.maxIter, 'f-maxit', 1, '') +
+      fldNum('Convergence tol (damage)', p.run.tol, 'f-tol', 0.001, '');
+  } else if (id === 'monitors') {
+    h = T('Monitoring points') + `<table class="rtable" id="mtable">` +
+      tableHead(['Name', 'x [mm]', 'y [mm]', 'Direction', '']);
+    (p.monitors || []).forEach((m, i) => {
+      h += `<tr><td><input data-i="${i}" data-k="name" type="text" value="${m.name}" style="width:95px"></td>` +
+        tin(i, 'x', m.x, 70) + tin(i, 'y', m.y, 70) +
+        `<td><select data-i="${i}" data-k="dir">
+          <option value="uy" ${m.dir === 'uy' ? 'selected' : ''}>u_y</option>
+          <option value="ux" ${m.dir === 'ux' ? 'selected' : ''}>u_x</option></select></td>` + tdel(i) + '</tr>';
+    });
+    h += `</table><button class="btn" id="f-addmon">＋ Add monitoring point</button>
+      <div class="fnote">Records displacement at the nearest node each load step → Results ▸ Load–deflection chart.</div>`;
+  } else if (id === 'check') {
+    let info = '';
+    try {
+      const g = buildGeometry(p);
+      let nc = 0; for (const m of g.cellMat) if (m >= 0) nc++;
+      info = `${nc} concrete elements, ${p.bars.length} bar definition(s), ${(p.supports || []).length} support(s), ${(p.loads || []).length} load(s). Total Σ|F| = ${totalLoadkN(1).toFixed(1)} kN.`;
+    } catch (e) { info = '⚠ ' + e.message; }
+    h = T('Check data & run') + `<div class="fnote">${info}</div>` +
+      fldNum('Number of load steps', p.run.steps, 'f-steps2', 1, `→ ${(totalLoadkN(1) / p.run.steps).toFixed(1)} kN per step`) +
+      `<label class="frow"><span>Linear elastic only</span><input type="checkbox" id="f-linear2" ${p.run.linear ? 'checked' : ''}><em></em></label>
+       <button class="btn btn-run" id="f-run">▶ &nbsp;RUN ANALYSIS</button>
+       <div id="run-status" class="fnote"></div>`;
+  } else if (id === 'results') {
+    if (!App.results) h = T('Post-processing') + `<div class="fnote">No results yet — run the analysis first.</div>`;
+    else {
+      const q = App.view.quantity, nS = App.results.length;
+      const opts = [
+        ['uy', 'Deflection u_y'], ['ux', 'Displacement u_x'],
+        ['sxx', 'Stress σxx'], ['syy', 'Stress σyy'], ['sxy', 'Shear τxy'],
+        ['s1', 'Principal σ1'], ['s2', 'Principal σ2'],
+        ['exx', 'Strain εxx'], ['e1', 'Principal ε1'],
+        ['dmg', 'Damage / cracking'], ['cw', 'Crack width w'],
+        ['steel', 'Steel stress'], ['slip', 'Bond slip']
+      ].map(o => `<option value="${o[0]}" ${q === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('');
+      h = T('Post-processing') +
+        `<label class="frow"><span>Quantity</span><select id="f-qty">${opts}</select><em></em></label>` +
+        `<label class="frow"><span>Load step</span><input type="range" id="f-step" min="0" max="${nS - 1}" value="${App.view.step}" style="width:130px">
+          <em id="f-steplbl">${App.view.step + 1}/${nS} (λ=${App.results[App.view.step].lambda.toFixed(2)})</em></label>` +
+        `<label class="frow"><span>Deformation scale</span><input type="text" id="f-dscale" value="${App.view.defScale}"><em>× (or "auto"/"0")</em></label>` +
+        `<label class="frow"><span>Show mesh</span><input type="checkbox" id="f-shmesh" ${App.view.showMesh ? 'checked' : ''}><em></em></label>` +
+        `<label class="frow"><span>Show cracks / crushing</span><input type="checkbox" id="f-shcr" ${App.view.showCracks ? 'checked' : ''}><em></em></label>` +
+        `<label class="frow"><span>Show rebar</span><input type="checkbox" id="f-shrb" ${App.view.showRebar ? 'checked' : ''}><em></em></label>`;
+    }
+  } else if (id === 'chart') {
+    if (!App.results) h = T('Load–deflection chart') + `<div class="fnote">No results yet — run the analysis first.</div>`;
+    else if (!(p.monitors || []).length) h = T('Load–deflection chart') + `<div class="fnote">No monitoring points — add them under Run ▸ Monitoring points, then re-run.</div>`;
+    else {
+      const data = getMonitorData();
+      h = T('Load–deflection chart') +
+        `<div class="fnote">Total applied load vs. monitored displacement (${App.results.length} steps + origin). Downward deflection plotted positive.</div>` +
+        `<table class="rtable">` + tableHead(['Monitor', 'Node @ (x, y)', 'Final displ. [mm]', 'Final load [kN]']) +
+        data.mons.map(m => `<tr><td>${m.name}</td><td>(${m.nx.toFixed(0)}, ${m.ny.toFixed(0)})</td>
+          <td>${m.series[m.series.length - 1].toFixed(3)}</td><td>${data.loads[data.loads.length - 1].toFixed(1)}</td></tr>`).join('') +
+        `</table><button class="btn" id="f-csv">⬇ Export curve data (CSV)</button>`;
+    }
+  } else if (id === 'summary') {
+    if (!App.results) h = T('Summary') + `<div class="fnote">No results yet.</div>`;
+    else {
+      h = T('Summary — load-step history') + `<table class="rtable">` +
+        tableHead(['Step', 'λ', 'Iter', 'Max defl [mm]', 'w_max [mm]', 'Max steel σ [MPa]', 'Max slip [mm]', 'Cracked', 'Crushed', 'Yield', 'Rupt']);
+      App.results.forEach(r => {
+        h += `<tr${r.failed ? ' style="background:#5c2430"' : ''}><td>${r.step}</td><td>${r.lambda.toFixed(2)}</td><td>${r.iters}${r.converged ? '' : '*'}</td>
+          <td>${r.maxDefl.toFixed(3)}</td><td>${(r.maxCW || 0).toFixed(3)}</td><td>${r.maxSteel.toFixed(1)}</td><td>${r.maxSlip.toFixed(4)}</td>
+          <td>${r.nCracked}</td><td>${r.nCrushed || 0}</td><td>${r.nYield || 0}</td><td>${r.nRupt || 0}</td></tr>`;
+      });
+      const fl = App.results.find(r => r.failed);
+      h += `</table><div class="fnote">* max iterations reached.` +
+        (fl ? `<br><b style="color:#ff7d6d">STRUCTURAL FAILURE at λ=${fl.lambda.toFixed(2)} — mode: ${fl.failureMode}.</b>` : '') +
+        `<br>w=(ε₁−ε₀)·h (crack band). Crushed: εc≥εcu. Rupt: εs≥εu.</div>`;
+    }
+  }
+  host.innerHTML = h;
+  bindForm();
+}
+
+// ------------------- form binding -------------------
+function num(id, def) { const v = parseFloat(($(id) || {}).value); return isFinite(v) ? v : def; }
+function bindTable(tableId, arr, after) {
+  document.querySelectorAll(`#${tableId} input, #${tableId} select`).forEach(inp => {
+    inp.addEventListener('change', () => {
+      const i = +inp.dataset.i, k = inp.dataset.k;
+      if (!arr[i]) return;
+      if (inp.type === 'checkbox') arr[i][k] = inp.checked;
+      else if (k === 'name') arr[i][k] = inp.value;
+      else if (k === 'jl') arr[i][k] = inp.value.split(',').map(s => Math.max(0, (parseInt(s.trim()) || 1) - 1));
+      else if (k === 'type' || k === 'dir') arr[i][k] = inp.value;
+      else if (inp.tagName === 'SELECT') arr[i][k] = parseInt(inp.value);
+      else arr[i][k] = parseFloat(inp.value) || 0;
+      if (after) after(); else { draw(); }
+    });
+  });
+  document.querySelectorAll(`#${tableId} [data-del]`).forEach(b2 => b2.addEventListener('click', () => {
+    arr.splice(+b2.dataset.del, 1); renderForm(); updateMatPlot(); draw();
+  }));
+}
+function bindForm() {
+  const p = App.params, id = App.selected;
+  const on = (i, ev, fn) => { const e = $(i); if (e) e.addEventListener(ev, fn); };
+  const commit = () => {
+    if (id === 'general') { p.title = ($('f-title') || {}).value || p.title; p.selfWeight = !!($('f-sw') || {}).checked; buildTree(); selectItem(id); return; }
+    if (id === 'bond') {
+      p.bond.perfect = !!($('f-perfect') || {}).checked;
+      p.bond.tauMax = num('f-tau', p.bond.tauMax); p.bond.s1 = num('f-s1', p.bond.s1); p.bond.alpha = num('f-alpha', p.bond.alpha);
+      p.bond.s2 = num('f-s2', p.bond.s2); p.bond.s3 = num('f-s3', p.bond.s3); p.bond.tauF = num('f-tauf', p.bond.tauF);
+      updateMatPlot();
+    }
+    if (id === 'mesh') { p.meshSize = Math.max(5, num('f-msize', p.meshSize)); renderForm(); }
+    if (id === 'analysis') {
+      p.run.linear = !!($('f-linear') || {}).checked;
+      p.run.steps = Math.max(1, Math.round(num('f-steps', p.run.steps)));
+      p.run.maxIter = Math.max(1, Math.round(num('f-maxit', p.run.maxIter)));
+      p.run.tol = num('f-tol', p.run.tol);
+    }
+    if (id === 'check') {
+      if ($('f-steps2')) p.run.steps = Math.max(1, Math.min(200, Math.round(num('f-steps2', p.run.steps))));
+      if ($('f-linear2')) p.run.linear = !!$('f-linear2').checked;
+      renderForm();
+    }
+    draw(); updateStatus();
+  };
+  document.querySelectorAll('#form-host input:not([data-i]), #form-host select:not([data-i])').forEach(e => {
+    if (['f-qty', 'f-step', 'f-dscale', 'f-shmesh', 'f-shcr', 'f-shrb', 'f-matplot-sel'].includes(e.id)) return;
+    e.addEventListener('change', commit);
+  });
+  // tables
+  bindTable('mattable', p.materials, () => { updateMatPlot(); draw(); });
+  bindTable('bartable', p.bars, () => { updateMatPlot(); draw(); });
+  bindTable('jtable', p.joints, () => { renderForm(); draw(); });
+  bindTable('ltable', p.lines);
+  bindTable('metable', p.macros);
+  bindTable('stable', p.supports, () => { renderForm(); draw(); });
+  bindTable('ldtable', p.loads, () => { renderForm(); draw(); });
+  bindTable('mtable', p.monitors);
+  // add buttons
+  on('f-addmat', 'click', () => { p.materials.push({ name: 'Material ' + (p.materials.length + 1), E: 30000, nu: 0.2, fc: 30, ft: 2.5, Gf: 0.07, ecu: 0.0035 }); renderForm(); });
+  on('f-addbar', 'click', () => { p.bars.push({ j1: 0, j2: 1, nBars: 2, dia: 12, Es: 200000, fy: 500, hPct: 1, euPct: 5 }); renderForm(); draw(); });
+  on('f-addbarline', 'click', () => {
+    const L = p.lines[+(($('f-barline') || {}).value || 0)];
+    if (L) { p.bars.push({ j1: L.a, j2: L.b, nBars: 2, dia: 12, Es: 200000, fy: 500, hPct: 1, euPct: 5 }); renderForm(); updateMatPlot(); draw(); }
+  });
+  on('f-addjoint', 'click', () => { p.joints.push({ x: 0, y: 0 }); renderForm(); draw(); });
+  on('f-addline', 'click', () => { p.lines.push({ a: 0, b: 1 }); renderForm(); draw(); });
+  on('f-addmacro', 'click', () => { p.macros.push({ jl: [0, 1, 2, 3], mat: 0, b: 200 }); renderForm(); draw(); });
+  on('f-addsupp', 'click', () => { p.supports.push({ type: 'joint', a: 0, b: 1, fx: false, fy: true }); renderForm(); draw(); });
+  on('f-addload', 'click', () => { p.loads.push({ type: 'joint', a: 0, b: 1, dir: 'y', val: -10 }); renderForm(); draw(); });
+  on('f-addmon', 'click', () => { p.monitors.push({ x: 0, y: 0, dir: 'uy', name: 'M' + (p.monitors.length + 1) }); renderForm(); draw(); });
+  on('f-matplot-sel', 'change', updateMatPlot);
+  on('f-run', 'click', runNow);
+  on('f-csv', 'click', exportMonitorCSV);
+  // results controls
+  on('f-qty', 'change', () => { App.view.quantity = $('f-qty').value; draw(); });
+  on('f-step', 'input', () => {
+    App.view.step = +$('f-step').value;
+    $('f-steplbl').textContent = `${App.view.step + 1}/${App.results.length} (λ=${App.results[App.view.step].lambda.toFixed(2)})`;
+    draw();
+  });
+  on('f-dscale', 'change', () => { App.view.defScale = $('f-dscale').value; draw(); });
+  on('f-shmesh', 'change', () => { App.view.showMesh = $('f-shmesh').checked; draw(); });
+  on('f-shcr', 'change', () => { App.view.showCracks = $('f-shcr').checked; draw(); });
+  on('f-shrb', 'change', () => { App.view.showRebar = $('f-shrb').checked; draw(); });
+}
+
+// ------------------- material diagrams (messages panel) -------------------
+function updateMatPlot() {
+  const cvp = $('matplot'); if (!cvp) return;
+  const id = App.selected;
+  if (id === 'materials') { cvp.style.display = 'block'; plotConcrete(App.params.materials[+(($('f-matplot-sel') || {}).value || 0)] || App.params.materials[0]); }
+  else if (id === 'bars-mat' || id === 'geometry-bars') { cvp.style.display = 'block'; plotSteel(App.params.bars[0]); }
+  else if (id === 'bond') { cvp.style.display = 'block'; plotBond(App.params.bond); }
+  else cvp.style.display = 'none';
+}
+function plotFrame(c, title, xlab, ylab) {
+  const W = c.canvas.width, H = c.canvas.height;
+  c.fillStyle = '#10151c'; c.fillRect(0, 0, W, H);
+  c.strokeStyle = '#2a3442'; c.lineWidth = 1;
+  c.font = '11px monospace'; c.fillStyle = '#9fb3c8';
+  c.fillText(title, 8, 13);
+  c.fillText(xlab, W - 90, H - 6);
+  c.save(); c.translate(10, 90); c.rotate(-Math.PI / 2); c.fillText(ylab, 0, 0); c.restore();
+  return { mL: 45, mR: 12, mT: 20, mB: 22, W, H };
+}
+function plotCurve(c, fr, pts, xmin, xmax, ymin, ymax, color) {
+  const px = x => fr.mL + (x - xmin) / (xmax - xmin) * (fr.W - fr.mL - fr.mR);
+  const py = y => fr.mT + (1 - (y - ymin) / (ymax - ymin)) * (fr.H - fr.mT - fr.mB);
+  // axes through zero
+  c.strokeStyle = '#3a4a5c';
+  c.beginPath(); c.moveTo(px(xmin), py(0)); c.lineTo(px(xmax), py(0)); c.stroke();
+  c.beginPath(); c.moveTo(px(0), py(ymin)); c.lineTo(px(0), py(ymax)); c.stroke();
+  c.strokeStyle = color; c.lineWidth = 1.8;
+  c.beginPath();
+  pts.forEach(([x, y], i) => { if (i === 0) c.moveTo(px(x), py(y)); else c.lineTo(px(x), py(y)); });
+  c.stroke(); c.lineWidth = 1;
+  c.fillStyle = '#8fa';
+  return { px, py };
+}
+function plotConcrete(m) {
+  if (!m) return;
+  const c = $('matplot').getContext('2d');
+  const fr = plotFrame(c, `σ–ε concrete: ${m.name}  (h=${App.params.meshSize} mm)`, 'ε [‰]', 'σ [MPa]');
+  const e0c = 2 * m.fc / m.E, ecu = m.ecu, e0t = m.ft / m.E;
+  const hel = App.params.meshSize;
+  let ef = e0t + m.Gf / (m.ft * hel); if (ef < 1.2 * e0t) ef = 1.2 * e0t;
+  const pts = [];
+  for (let e = -1.15 * ecu; e <= 0; e += ecu / 60) {
+    const ec = -e; let s;
+    if (ec <= e0c) { const x = ec / e0c; s = m.fc * (2 * x - x * x); }
+    else if (ec <= ecu) s = m.fc * (1 - 0.8 * (ec - e0c) / (ecu - e0c));
+    else s = 0.2 * m.fc;
+    pts.push([e * 1000, -s]);
+  }
+  for (let e = 0; e <= 3.2 * ef; e += ef / 40) {
+    const s = e <= e0t ? m.E * e : m.ft * Math.exp(-(e - e0t) / (ef - e0t));
+    pts.push([e * 1000, s]);
+  }
+  const { px, py } = plotCurve(c, fr, pts, -1.2 * ecu * 1000, 3.3 * ef * 1000, -1.12 * m.fc, 1.6 * m.ft, '#00d0ff');
+  c.fillStyle = '#9fb3c8'; c.font = '10px monospace';
+  c.fillText(`fc=${m.fc}`, px(-ecu * 1000), py(-m.fc) - 4);
+  c.fillText(`ft=${m.ft}`, px(e0t * 1000) + 3, py(m.ft) - 4);
+  c.fillText(`εcu=${(ecu * 1000).toFixed(1)}‰ (crush)`, px(-ecu * 1000), py(-0.2 * m.fc) + 12);
+}
+function plotSteel(b2) {
+  if (!b2) return;
+  const c = $('matplot').getContext('2d');
+  const fr = plotFrame(c, `σ–ε reinforcement: bar 1 (Ø${b2.dia})`, 'ε [%]', 'σ [MPa]');
+  const ey = b2.fy / b2.Es, eu = (b2.euPct || 5) / 100, Eh = (b2.hPct || 1) / 100 * b2.Es;
+  const fu = b2.fy + Eh * (eu - ey);
+  const pts = [[0, 0], [ey * 100, b2.fy], [eu * 100, fu], [eu * 100, 0], [eu * 108, 0]];
+  const { px, py } = plotCurve(c, fr, pts, 0, eu * 112, 0, 1.25 * fu, '#ffd000');
+  c.fillStyle = '#9fb3c8'; c.font = '10px monospace';
+  c.fillText(`fy=${b2.fy}`, px(ey * 100) + 4, py(b2.fy) - 5);
+  c.fillText(`rupture εu=${(eu * 100).toFixed(1)}%`, px(eu * 100) - 95, py(fu) - 6);
+}
+function plotBond(bd) {
+  const c = $('matplot').getContext('2d');
+  const fr = plotFrame(c, bd.perfect ? 'Bond: PERFECT (rigid)' : 'Bond τ–s (fib MC2010)', 's [mm]', 'τ [MPa]');
+  if (bd.perfect) return;
+  const pts = [];
+  const smax = bd.s3 * 1.25;
+  for (let s = 0; s <= smax; s += smax / 160) pts.push([s, bondTau(Math.max(s, 1e-4), bd)]);
+  const { px, py } = plotCurve(c, fr, pts, 0, smax, 0, 1.25 * bd.tauMax, '#ff5db1');
+  c.fillStyle = '#9fb3c8'; c.font = '10px monospace';
+  c.fillText(`τmax=${bd.tauMax}`, px(bd.s1), py(bd.tauMax) - 5);
+  c.fillText(`τf=${bd.tauF}`, px(bd.s3) + 3, py(bd.tauF) - 4);
+}
+
+// ------------------- run -------------------
+function runNow() {
+  const st = $('run-status'); if (st) st.textContent = 'Running…';
+  logMsg('--- RUN: ' + App.params.title + ' ---', 'log-h');
+  setTimeout(() => {
+    try {
+      const t0 = performance.now();
+      const out = runAnalysis(App.params, m => logMsg(m));
+      App.model = out.model; App.results = out.results;
+      App.view.step = out.results.length - 1;
+      const last = out.results[out.results.length - 1];
+      logMsg(`Done in ${((performance.now() - t0) / 1000).toFixed(2)} s. Max deflection ${last.maxDefl.toFixed(3)} mm, w_max ${(last.maxCW || 0).toFixed(3)} mm, max steel ${last.maxSteel.toFixed(0)} MPa, ${last.nCracked} cracked / ${last.nCrushed || 0} crushed elems, ${last.nYield || 0} yielded / ${last.nRupt || 0} ruptured bars.`, last.failed ? 'log-err' : 'log-ok');
+      if (st) st.textContent = 'Finished ✓ — open Results ▸ Post-processing.';
+      selectItem('results');
+      App.view.mode = 'results';
+      fit(); draw();
+    } catch (err) {
+      logMsg('ERROR: ' + err.message, 'log-err');
+      if (st) st.textContent = 'Failed: ' + err.message;
+    }
+  }, 30);
+}
+
+// ------------------- canvas -------------------
+let cv, ctx;
+function bbox() {
+  const p = App.params;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const J of p.joints) { x0 = Math.min(x0, J.x); x1 = Math.max(x1, J.x); y0 = Math.min(y0, J.y); y1 = Math.max(y1, J.y); }
+  if (!isFinite(x0)) { x0 = 0; x1 = 1000; y0 = 0; y1 = 500; }
+  return { x0, x1, y0, y1, w: Math.max(x1 - x0, 10), h: Math.max(y1 - y0, 10) };
+}
+function fit() {
+  const bb = bbox(), W = cv.width, Hc = cv.height, m = 70;
+  const s = Math.min((W - 2 * m) / bb.w, (Hc - 2 * m) / bb.h);
+  App.cam.scale = s;
+  App.cam.ox = (W - s * bb.w) / 2 - s * bb.x0;
+  App.cam.oy = Hc - ((Hc - s * bb.h) / 2 - s * bb.y0);
+}
+function w2s(x, y) { return [App.cam.ox + x * App.cam.scale, App.cam.oy - y * App.cam.scale]; }
+function cmap(t) {
+  t = Math.max(0, Math.min(1, t));
+  const r = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 3)));
+  const g = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 2)));
+  const b2 = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 1)));
+  return `rgb(${Math.round(255 * r)},${Math.round(255 * g)},${Math.round(255 * b2)})`;
+}
+function line(a, b2, c, d) { ctx.beginPath(); ctx.moveTo(a, b2); ctx.lineTo(c, d); ctx.stroke(); }
+function nodeXY(model, n, u, sc) {
+  let x = model.X[n], y = model.Y[n];
+  if (u && sc) { x += u[2 * n] * sc; y += u[2 * n + 1] * sc; }
+  return [x, y];
+}
+function hudText(s) { ctx.fillStyle = '#9adcff'; ctx.font = '12px monospace'; ctx.fillText(s, 12, 18); }
+
+function draw() {
+  if (!ctx) return;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (App.view.mode === 'chart' && App.results) { drawChart(); return; }
+  drawAxes();
+  if (App.view.mode === 'results' && App.results) drawResults();
+  else drawModel();
+}
+function drawAxes() {
+  const [x0, y0] = w2s(0, 0);
+  ctx.strokeStyle = '#ffff00'; ctx.fillStyle = '#ffff00'; ctx.lineWidth = 1.2;
+  const ax = 46;
+  line(x0, y0, x0 + ax, y0);
+  ctx.beginPath(); ctx.moveTo(x0 + ax, y0); ctx.lineTo(x0 + ax - 7, y0 - 3); ctx.lineTo(x0 + ax - 7, y0 + 3); ctx.fill();
+  line(x0, y0, x0, y0 - ax);
+  ctx.beginPath(); ctx.moveTo(x0, y0 - ax); ctx.lineTo(x0 - 3, y0 - ax + 7); ctx.lineTo(x0 + 3, y0 - ax + 7); ctx.fill();
+  ctx.font = '13px monospace';
+  ctx.fillText('X', x0 + ax + 6, y0 + 4); ctx.fillText('Y', x0 - 4, y0 - ax - 6);
+}
+
+const MAT_FILLS = ['#4a4f55', '#5a5145', '#45525a', '#525a45', '#5a4552'];
+function drawModel() {
+  const p = App.params;
+  // geometry preview
+  let g = null;
+  try { g = buildGeometry(p); } catch (e) { /* ignore */ }
+  if (g) {
+    // active cells fill + mesh
+    for (let i = 0; i < g.nxg; i++) for (let j = 0; j < g.nyg; j++) {
+      const m = g.cellMat[i * g.nyg + j];
+      if (m < 0) continue;
+      const [a, b2] = w2s(g.XG[i], g.YG[j + 1]);
+      const [c, d] = w2s(g.XG[i + 1], g.YG[j]);
+      ctx.fillStyle = MAT_FILLS[m % MAT_FILLS.length];
+      ctx.fillRect(a, b2, c - a, d - b2);
+      if (App.view.showMesh) { ctx.strokeStyle = 'rgba(0,190,190,0.55)'; ctx.lineWidth = 0.5; ctx.strokeRect(a, b2, c - a, d - b2); }
+    }
+  }
+  // lines
+  ctx.strokeStyle = '#00ffee'; ctx.lineWidth = 1.4;
+  for (const L of p.lines) {
+    const J1 = p.joints[L.a], J2 = p.joints[L.b];
+    if (!J1 || !J2) continue;
+    const [a, b2] = w2s(J1.x, J1.y), [c, d] = w2s(J2.x, J2.y);
+    line(a, b2, c, d);
+  }
+  // macro outlines
+  ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 1.6;
+  for (const m of p.macros) {
+    const bb = macroBBox(p, m);
+    if (!isFinite(bb.x0)) continue;
+    const [a, b2] = w2s(bb.x0, bb.y1), [c, d] = w2s(bb.x1, bb.y0);
+    ctx.strokeRect(a, b2, c - a, d - b2);
+  }
+  // rebar
+  ctx.strokeStyle = '#ff3333'; ctx.lineWidth = 2.5;
+  for (const b2 of p.bars) {
+    const J1 = p.joints[b2.j1], J2 = p.joints[b2.j2];
+    if (!J1 || !J2) continue;
+    const [a, bb2] = w2s(J1.x, J1.y), [c, d] = w2s(J2.x, J2.y);
+    line(a, bb2, c, d);
+  }
+  // supports
+  for (const s of (p.supports || [])) {
+    const pts = [];
+    if (s.type === 'joint') { const J = p.joints[s.a]; if (J) pts.push(J); }
+    else {
+      const J1 = p.joints[s.a], J2 = p.joints[s.b];
+      if (J1 && J2) for (let t = 0; t <= 1.0001; t += 0.2) pts.push({ x: J1.x + (J2.x - J1.x) * t, y: J1.y + (J2.y - J1.y) * t });
+    }
+    ctx.fillStyle = '#ffcc00'; ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 1.4;
+    for (const pt of pts) {
+      const [sx, sy] = w2s(pt.x, pt.y);
+      if (s.fy) { ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx - 8, sy + 13); ctx.lineTo(sx + 8, sy + 13); ctx.closePath(); ctx.fill(); }
+      if (s.fx) { ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx - 13, sy - 8); ctx.lineTo(sx - 13, sy + 8); ctx.closePath(); ctx.fill(); }
+    }
+  }
+  // loads (magenta, like ATENA)
+  ctx.strokeStyle = '#ff44ff'; ctx.fillStyle = '#ff44ff'; ctx.lineWidth = 2;
+  for (const l of (p.loads || [])) {
+    const pts = [];
+    if (l.type === 'joint') { const J = p.joints[l.a]; if (J) pts.push(J); }
+    else {
+      const J1 = p.joints[l.a], J2 = p.joints[l.b];
+      if (J1 && J2) for (let t = 0; t <= 1.0001; t += 0.25) pts.push({ x: J1.x + (J2.x - J1.x) * t, y: J1.y + (J2.y - J1.y) * t });
+    }
+    const len = 40, sgn = Math.sign(l.val) || 1;
+    pts.forEach((pt, pi) => {
+      const [sx, sy] = w2s(pt.x, pt.y);
+      if (l.dir === 'y') {
+        // arrow pointing toward the point, direction of force
+        const tip = sy, tail = sy - sgn * len; // val<0 (down): tail above, arrow down
+        line(sx, tail, sx, tip - sgn * 3);
+        ctx.beginPath(); ctx.moveTo(sx, tip); ctx.lineTo(sx - 5, tip - sgn * 10); ctx.lineTo(sx + 5, tip - sgn * 10); ctx.fill();
+      } else {
+        const tip = sx, tail = sx - sgn * len;
+        line(tail, sy, tip - sgn * 3, sy);
+        ctx.beginPath(); ctx.moveTo(tip, sy); ctx.lineTo(tip - sgn * 10, sy - 5); ctx.lineTo(tip - sgn * 10, sy + 5); ctx.fill();
+      }
+      if (pi === 0) {
+        ctx.font = '12px monospace';
+        ctx.fillText(`${l.val} ${l.type === 'line' ? 'kN/m' : 'kN'} ${l.dir.toUpperCase()}`, sx + 8, sy - (l.dir === 'y' ? sgn * len : 0) - 6);
+      }
+    });
+  }
+  // joints
+  for (let i = 0; i < p.joints.length; i++) {
+    const [sx, sy] = w2s(p.joints[i].x, p.joints[i].y);
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath(); ctx.arc(sx, sy, 3.5, 0, 6.284); ctx.fill();
+    ctx.fillStyle = '#cccc66'; ctx.font = '11px monospace';
+    ctx.fillText(String(i + 1), sx + 5, sy - 5);
+  }
+  // monitors
+  for (let i = 0; i < (p.monitors || []).length; i++) {
+    const m = p.monitors[i];
+    const [sx, sy] = w2s(m.x, m.y);
+    const col = MON_COLORS[i % MON_COLORS.length];
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(sx, sy, 7, 0, 6.284); ctx.stroke();
+    line(sx - 11, sy, sx + 11, sy); line(sx, sy - 11, sx, sy + 11);
+    ctx.font = '12px monospace'; ctx.fillText(m.name, sx + 12, sy - 10);
+  }
+  const bb = bbox();
+  hudText(`MODEL — ${p.joints.length} joints, ${p.macros.length} macro(s), ${p.bars.length} bar(s), ${(p.supports || []).length} support(s), ${(p.loads || []).length} load(s)   [${bb.w.toFixed(0)} × ${bb.h.toFixed(0)} mm]`);
+}
+
+// ------------------- results drawing -------------------
+function drawResults() {
+  const model = App.model, res = App.results[App.view.step], v = App.view, p = App.params;
+  const bb = bbox();
+  let sc = 0;
+  if (v.defScale === 'auto') {
+    const target = 0.12 * Math.max(bb.w, bb.h);
+    sc = res.maxDefl > 1e-9 ? target / res.maxDefl : 0;
+  } else sc = parseFloat(v.defScale) || 0;
+
+  const q = v.quantity;
+  let vals = null, title = '', isNodal = false, isBar2 = false, isSlip = false;
+  if (q === 'uy') { isNodal = true; title = 'Deflection u_y [mm]'; }
+  else if (q === 'ux') { isNodal = true; title = 'Displacement u_x [mm]'; }
+  else if (q === 'steel') { isBar2 = true; title = 'Steel stress [MPa]'; }
+  else if (q === 'slip') { isSlip = true; title = 'Bond slip [mm]'; }
+  else {
+    const names = { sxx: 'σxx [MPa]', syy: 'σyy [MPa]', sxy: 'τxy [MPa]', s1: 'σ1 [MPa]', s2: 'σ2 [MPa]', exx: 'εxx [‰]', e1: 'ε1 [‰]', dmg: 'Damage [-]', cw: 'Crack width [mm]' };
+    title = names[q]; vals = res.el[q];
+  }
+  let vmin = Infinity, vmax = -Infinity;
+  const nodal = new Float64Array(model.nNodes);
+  if (isNodal) {
+    for (let n = 0; n < model.nNodes; n++) {
+      nodal[n] = q === 'uy' ? res.u[2 * n + 1] : res.u[2 * n];
+      if (!model.isBar[n]) { vmin = Math.min(vmin, nodal[n]); vmax = Math.max(vmax, nodal[n]); }
+    }
+  } else if (isBar2) { for (const b2 of res.bars) { vmin = Math.min(vmin, b2.sig); vmax = Math.max(vmax, b2.sig); } }
+  else if (isSlip) { for (const s of res.springs) { vmin = Math.min(vmin, s.slip); vmax = Math.max(vmax, s.slip); } }
+  else { for (const x of vals) { vmin = Math.min(vmin, x); vmax = Math.max(vmax, x); } }
+  if (vmax - vmin < 1e-12) vmax = vmin + 1e-12;
+  const scale1000 = (q === 'exx' || q === 'e1');
+
+  for (let e = 0; e < model.quads.length; e++) {
+    const qd = model.quads[e];
+    let t;
+    if (isNodal) { let s = 0; for (const n of qd) s += nodal[n]; t = (s / 4 - vmin) / (vmax - vmin); }
+    else if (isBar2 || isSlip) t = null;
+    else t = (vals[e] - vmin) / (vmax - vmin);
+    const pts = qd.map(n => { const [x, y] = nodeXY(model, n, res.u, sc); return w2s(x, y); });
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < 4; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = t === null ? '#20242a' : cmap(t);
+    ctx.fill();
+    if (v.showMesh) { ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 0.5; ctx.stroke(); }
+  }
+  if (v.showCracks) {
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.4;
+    for (let e = 0; e < model.quads.length; e++) {
+      if (!res.el.cracked[e]) continue;
+      const qd = model.quads[e];
+      let cx = 0, cy = 0;
+      for (const n of qd) { const [x, y] = nodeXY(model, n, res.u, sc); cx += x / 4; cy += y / 4; }
+      const ang = res.el.ang[e] + Math.PI / 2;
+      const r = 0.36 * Math.min(model.dx, model.dy) * (0.4 + 0.6 * Math.min(1, res.el.dmg[e] / 0.9));
+      const [a, b2] = w2s(cx - r * Math.cos(ang), cy - r * Math.sin(ang));
+      const [c, d] = w2s(cx + r * Math.cos(ang), cy + r * Math.sin(ang));
+      line(a, b2, c, d);
+    }
+    ctx.strokeStyle = '#ff2020'; ctx.lineWidth = 1.6;
+    for (let e = 0; e < model.quads.length; e++) {
+      if (!res.el.crushed[e]) continue;
+      const qd = model.quads[e];
+      let cx = 0, cy = 0;
+      for (const n of qd) { const [x, y] = nodeXY(model, n, res.u, sc); cx += x / 4; cy += y / 4; }
+      const r = 0.28 * Math.min(model.dx, model.dy);
+      let [a, b2] = w2s(cx - r, cy - r), [c, d] = w2s(cx + r, cy + r);
+      line(a, b2, c, d);
+      [a, b2] = w2s(cx - r, cy + r); [c, d] = w2s(cx + r, cy - r);
+      line(a, b2, c, d);
+    }
+  }
+  if (v.showRebar || isBar2 || isSlip) {
+    for (let ib = 0; ib < model.bars.length; ib++) {
+      const bel = model.bars[ib];
+      const [x1, y1] = nodeXY(model, bel.n1, res.u, sc);
+      const [x2, y2] = nodeXY(model, bel.n2, res.u, sc);
+      const [a, b2] = w2s(x1, y1), [c, d] = w2s(x2, y2);
+      if (res.bars[ib].ruptured) { ctx.strokeStyle = '#777'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); }
+      else if (isBar2) { const t = (res.bars[ib].sig - vmin) / (vmax - vmin); ctx.strokeStyle = cmap(t); ctx.lineWidth = 5; }
+      else if (res.bars[ib].yielded) { ctx.strokeStyle = '#ff9900'; ctx.lineWidth = 3.5; }
+      else { ctx.strokeStyle = '#ff5555'; ctx.lineWidth = 2.5; }
+      line(a, b2, c, d);
+      ctx.setLineDash([]);
+    }
+    if (isSlip) {
+      for (let is2 = 0; is2 < model.springs.length; is2++) {
+        const s = model.springs[is2];
+        const [x, y] = nodeXY(model, s.nb, res.u, sc);
+        const [a, b2] = w2s(x, y);
+        const t = (res.springs[is2].slip - vmin) / (vmax - vmin);
+        ctx.fillStyle = cmap(t);
+        ctx.beginPath(); ctx.arc(a, b2, 4, 0, 6.284); ctx.fill();
+      }
+    }
+  }
+  drawLegend(title, scale1000 ? vmin * 1000 : vmin, scale1000 ? vmax * 1000 : vmax);
+  hudText(`RESULTS — step ${res.step} (λ=${res.lambda.toFixed(2)})  ${title}   def.scale ${sc.toFixed(1)}×   max defl ${res.maxDefl.toFixed(3)} mm${res.failed ? '   ■ FAILED: ' + res.failureMode : ''}`);
+}
+function drawLegend(title, vmin, vmax) {
+  const W = cv.width;
+  const x = W - 66, y0 = 46, h = Math.min(300, cv.height - 110), w = 18;
+  for (let i = 0; i < h; i++) { ctx.fillStyle = cmap(1 - i / h); ctx.fillRect(x, y0 + i, w, 1.5); }
+  ctx.strokeStyle = '#888'; ctx.strokeRect(x, y0, w, h);
+  ctx.fillStyle = '#fff'; ctx.font = '11px monospace';
+  const n = 6;
+  for (let i = 0; i <= n; i++) {
+    const v = vmax - (vmax - vmin) * i / n;
+    ctx.fillText(fmt(v), x - 52, y0 + h * i / n + 4);
+  }
+  ctx.font = '12px monospace'; ctx.fillText(title, x - 60, y0 - 12);
+}
+function fmt(v) {
+  const a = Math.abs(v);
+  if (a >= 1000) return v.toFixed(0);
+  if (a >= 10) return v.toFixed(1);
+  if (a >= 0.01) return v.toFixed(3);
+  if (a === 0) return '0';
+  return v.toExponential(1);
+}
+
+// ------------------- monitors & chart -------------------
+function nearestNode(x, y) {
+  const m = App.model; let best = 0, bd = Infinity;
+  for (let n = 0; n < m.nNodes; n++) {
+    if (m.isBar[n]) continue;
+    const d = (m.X[n] - x) ** 2 + (m.Y[n] - y) ** 2;
+    if (d < bd) { bd = d; best = n; }
+  }
+  return best;
+}
+function totalLoadkN(lambda) {
+  const p = App.params;
+  let tot = 0;
+  for (const l of (p.loads || [])) {
+    if (l.type === 'joint') tot += Math.abs(l.val);
+    else {
+      const J1 = p.joints[l.a], J2 = p.joints[l.b];
+      if (J1 && J2) tot += Math.abs(l.val) * Math.hypot(J2.x - J1.x, J2.y - J1.y) / 1000;
+    }
+  }
+  return lambda * tot;
+}
+function getMonitorData() {
+  const p = App.params, res = App.results;
+  const loads = [0].concat(res.map(r => totalLoadkN(r.lambda)));
+  const mons = (p.monitors || []).map(m => {
+    const n = nearestNode(m.x, m.y);
+    const series = [0].concat(res.map(r => m.dir === 'uy' ? -r.u[2 * n + 1] : r.u[2 * n]));
+    return { name: m.name, dir: m.dir, nx: App.model.X[n], ny: App.model.Y[n], series };
+  });
+  return { loads, mons };
+}
+function exportMonitorCSV() {
+  const d = getMonitorData();
+  let csv = 'load_kN' + d.mons.map(m => ',' + m.name.replace(/,/g, ' ') + '_' + m.dir + '_mm').join('') + '\n';
+  for (let i = 0; i < d.loads.length; i++)
+    csv += d.loads[i].toFixed(4) + d.mons.map(m => ',' + m.series[i].toFixed(6)).join('') + '\n';
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = (App.params.title || 'model') + '_load_deflection.csv'; a.click();
+  logMsg('Load–deflection curve exported to CSV.', 'log-ok');
+}
+const MON_COLORS = ['#00e5ff', '#ffd000', '#ff5db1', '#7dff6d', '#c39bff', '#ff9c40'];
+function drawChart() {
+  const W = cv.width, Hc = cv.height;
+  const d = getMonitorData();
+  if (!d.mons.length) {
+    ctx.fillStyle = '#ccc'; ctx.font = '14px monospace';
+    ctx.fillText('No monitoring points defined (Run ▸ Monitoring points).', 30, 50);
+    return;
+  }
+  const mL = 90, mR = 40, mT = 55, mB = 60;
+  const pw = W - mL - mR, ph = Hc - mT - mB;
+  ctx.fillStyle = '#0c0f14'; ctx.fillRect(mL, mT, pw, ph);
+  let xmax = 0, ymax = 0;
+  for (const m of d.mons) for (const v of m.series) xmax = Math.max(xmax, Math.abs(v));
+  ymax = Math.max(...d.loads);
+  if (xmax < 1e-9) xmax = 1;
+  if (ymax < 1e-9) ymax = 1;
+  xmax *= 1.06; ymax *= 1.08;
+  const px = v => mL + Math.abs(v) / xmax * pw;
+  const py = v => mT + ph - v / ymax * ph;
+  ctx.strokeStyle = '#2a3442'; ctx.fillStyle = '#aab'; ctx.font = '11px monospace'; ctx.lineWidth = 1;
+  const nt = 8;
+  for (let i = 0; i <= nt; i++) {
+    const gx = mL + pw * i / nt, gy = mT + ph * i / nt;
+    line(gx, mT, gx, mT + ph);
+    line(mL, gy, mL + pw, gy);
+    ctx.fillText(fmt(xmax * i / nt), gx - 12, mT + ph + 16);
+    ctx.fillText(fmt(ymax * (1 - i / nt)), mL - 55, gy + 4);
+  }
+  ctx.strokeStyle = '#8899aa'; ctx.lineWidth = 1.4; ctx.strokeRect(mL, mT, pw, ph);
+  ctx.fillStyle = '#ddd'; ctx.font = '13px monospace';
+  ctx.fillText('Displacement [mm]', mL + pw / 2 - 60, Hc - 18);
+  ctx.save(); ctx.translate(22, mT + ph / 2 + 60); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Total load [kN]', 0, 0); ctx.restore();
+  ctx.fillText('LOAD–DEFLECTION DIAGRAM — ' + App.params.title, mL, 30);
+  d.mons.forEach((m, im) => {
+    const col = MON_COLORS[im % MON_COLORS.length];
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < m.series.length; i++) {
+      const X = px(m.series[i]), Y = py(d.loads[i]);
+      if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+    }
+    ctx.stroke();
+    for (let i = 0; i < m.series.length; i++) { ctx.beginPath(); ctx.arc(px(m.series[i]), py(d.loads[i]), 3, 0, 6.284); ctx.fill(); }
+    ctx.fillText(`⊕ ${m.name} (${m.dir}) @ (${m.nx.toFixed(0)}, ${m.ny.toFixed(0)})`, mL + pw - 240, mT + 18 + im * 17);
+  });
+}
+
+// ------------------- canvas interaction / chrome -------------------
+function setupCanvas() {
+  cv = $('cv'); ctx = cv.getContext('2d');
+  const resize = () => {
+    const r = $('canvas-wrap').getBoundingClientRect();
+    cv.width = Math.max(200, r.width - 4); cv.height = Math.max(150, r.height - 30);
+    fit(); draw();
+  };
+  window.addEventListener('resize', resize);
+  setTimeout(resize, 0);
+  let drag = null;
+  cv.addEventListener('mousedown', e => { drag = { x: e.offsetX, y: e.offsetY }; });
+  window.addEventListener('mouseup', () => drag = null);
+  cv.addEventListener('mousemove', e => {
+    if (drag) {
+      App.cam.ox += e.offsetX - drag.x; App.cam.oy += e.offsetY - drag.y;
+      drag = { x: e.offsetX, y: e.offsetY }; draw();
+    }
+  });
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const f = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+    App.cam.ox = e.offsetX - (e.offsetX - App.cam.ox) * f;
+    App.cam.oy = e.offsetY - (e.offsetY - App.cam.oy) * f;
+    App.cam.scale *= f;
+    draw();
+  }, { passive: false });
+}
+function setupChrome() {
+  $('tb-fit').onclick = () => { fit(); draw(); };
+  $('tb-zin').onclick = () => { App.cam.scale *= 1.25; draw(); };
+  $('tb-zout').onclick = () => { App.cam.scale /= 1.25; draw(); };
+  $('tb-run').onclick = () => { selectItem('check'); runNow(); };
+  $('tb-model').onclick = () => { App.view.mode = 'model'; draw(); };
+  $('tb-res').onclick = () => { if (App.results) { App.view.mode = 'results'; selectItem('results'); } else logMsg('No results yet — run the analysis first.', 'log-err'); };
+  $('tb-new').onclick = () => { if (confirm('Reset model to defaults?')) location.reload(); };
+  $('tb-save').onclick = () => {
+    const blob = new Blob([JSON.stringify(App.params, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = (App.params.title || 'model') + '.rcfea.json'; a.click();
+  };
+  $('tb-open').onclick = () => $('file-open').click();
+  $('file-open').addEventListener('change', ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const pp = JSON.parse(rd.result);
+        if (!pp.joints || !pp.macros) throw new Error('Not a topology-format model file (v2).');
+        App.params = pp;
+        App.params.monitors = App.params.monitors || [];
+        App.results = null; buildTree(); selectItem('geometry-joints'); fit(); draw();
+        logMsg('Model loaded: ' + f.name, 'log-ok');
+      } catch (e) { logMsg('Cannot read file: ' + e.message, 'log-err'); }
+    };
+    rd.readAsText(f);
+  });
+  document.querySelectorAll('.menu-item').forEach(m => {
+    m.onclick = () => {
+      const a = m.dataset.act;
+      if (a === 'about') alert('RC-FEA 2D v2 — nonlinear plane-stress FEA of reinforced concrete with general topology.\n\nJoints → Lines → Macro-elements (materials) → Bars → Supports/Loads on any joints or lines.\nConcrete: Q4 + damage (Gf tension softening, parabola+softening compression, crushing at εcu).\nRebar: truss, bilinear + rupture at εu. Bond: full fib MC2010 τ–s law.\nSolver: banded LDLᵀ, total-secant iteration, failure detection.\n\nUnits mm / N / MPa / kN. Educational-research tool — verify against benchmarks before design use.');
+      if (a === 'run') { selectItem('check'); runNow(); }
+      if (a === 'new') $('tb-new').onclick();
+      if (a === 'save') $('tb-save').onclick();
+      if (a === 'open') $('tb-open').onclick();
+    };
+  });
+}
+function updateStatus() {
+  const p = App.params, bb = bbox();
+  $('statusbar').textContent = `${p.title}  |  ${bb.w.toFixed(0)} × ${bb.h.toFixed(0)} mm  |  h=${p.meshSize} mm  |  ${p.run.linear ? 'linear' : 'nonlinear, ' + p.run.steps + ' steps'}`;
+}
+
+// ------------------- boot -------------------
+window.addEventListener('DOMContentLoaded', () => {
+  buildTree(); setupCanvas(); setupChrome();
+  selectItem('geometry-joints'); updateStatus();
+  logMsg('RC-FEA 2D v2 ready. Topology: Joints → Lines → Macro-elements → Bars → Supports/Loads → Run ▶.', 'log-h');
+});
+
+</script>
+</body>
+</html>

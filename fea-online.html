@@ -44,8 +44,9 @@
   .head p{max-width:620px; margin:20px auto 0; color:#c9d5e0; font-size:1.06rem}
 
   /* cards */
-  .grid{display:grid; grid-template-columns:1fr 1fr; gap:26px; padding:14px 0 clamp(60px,10vw,110px)}
-  @media(max-width:760px){ .grid{grid-template-columns:1fr} }
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; padding:14px 0 clamp(60px,10vw,110px)}
+  @media(max-width:980px){ .grid{grid-template-columns:1fr 1fr} }
+  @media(max-width:700px){ .grid{grid-template-columns:1fr} }
   .card{
     position:relative; display:flex; flex-direction:column;
     background:linear-gradient(180deg, rgba(27,63,99,.55), rgba(20,48,77,.35));
@@ -121,6 +122,19 @@
       <p>Finite-element analysis &amp; design of reinforced-concrete floors — draw slabs, beams and columns, mesh, solve for moments and deflections, then design and report.</p>
       <ul><li>Slabs &amp; openings</li><li>Beams &amp; columns</li><li>Mesh &amp; solve</li><li>Design &amp; report</li></ul>
       <span class="card-cta">Open RC Floor →</span>
+    </article>
+
+    <!-- Card 3: Nonlinear RC-FEA -->
+    <article class="card">
+      <a href="rc-fea/index.html" class="card-link" aria-label="Open Nonlinear RC-FEA"></a>
+      <div class="card-icon">
+        <svg viewBox="0 0 32 32"><path d="M4 28V4M4 28h24M7 25c8-1 14-5 17-16M13 22l3 4M18 19l2 5M22 14l3 4"/></svg>
+      </div>
+      <div class="step">RC-FEA 2D · Nonlinear</div>
+      <h2>Nonlinear RC-FEA</h2>
+      <p>Nonlinear finite-element analysis of reinforced concrete members — beams, deep beams and walls — with concrete cracking &amp; crushing, rebar yielding, bond-slip, and full load-deflection response to failure.</p>
+      <ul><li>Cracking &amp; damage</li><li>Rebar &amp; bond</li><li>Load steps</li><li>Failure modes</li></ul>
+      <span class="card-cta">Open Nonlinear →</span>
     </article>
   </div>
 </main>
