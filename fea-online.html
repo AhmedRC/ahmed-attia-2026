@@ -44,8 +44,7 @@
   .head p{max-width:620px; margin:20px auto 0; color:#c9d5e0; font-size:1.06rem}
 
   /* cards */
-  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; padding:14px 0 clamp(60px,10vw,110px)}
-  @media(max-width:980px){ .grid{grid-template-columns:1fr 1fr} }
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:14px 0 clamp(60px,10vw,110px)}
   @media(max-width:700px){ .grid{grid-template-columns:1fr} }
   .card{
     position:relative; display:flex; flex-direction:column;
@@ -135,6 +134,19 @@
       <p>Nonlinear finite-element analysis of reinforced concrete members — beams, deep beams and walls — with concrete cracking &amp; crushing, rebar yielding, bond-slip, and full load-deflection response to failure.</p>
       <ul><li>Cracking &amp; damage</li><li>Rebar &amp; bond</li><li>Load steps</li><li>Failure modes</li></ul>
       <span class="card-cta">Open Nonlinear →</span>
+    </article>
+
+    <!-- Card 4: RC Design Studio -->
+    <article class="card">
+      <a href="rc-design-studio/index.html" class="card-link" aria-label="Open RC Design Studio"></a>
+      <div class="card-icon">
+        <svg viewBox="0 0 32 32"><path d="M6 4h20v24H6zM6 11h20M11 4v24M11 16h4M11 20h4M19 16h4M19 20h4"/></svg>
+      </div>
+      <div class="step">ECP 203 · SBC 304 · ACI 318</div>
+      <h2>RC Design Studio</h2>
+      <p>Code-based design of reinforced-concrete elements — beams, slabs, columns, walls and footings — with step-by-step checks and detailing drawings under the Egyptian, Saudi and ACI codes.</p>
+      <ul><li>Beams &amp; slabs</li><li>Columns &amp; walls</li><li>Footings</li><li>ECP / SBC / ACI</li></ul>
+      <span class="card-cta">Open Design Studio →</span>
     </article>
   </div>
 </main>

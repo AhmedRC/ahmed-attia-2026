@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC Design Studio — ECP 203 | SBC 304 | ACI 318</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap");
+:root{
+  /* Ahmed Attia Drar brand theme — navy + gold */
+  --bg:#0e2238; --panel:#14304d; --panel2:#1b3f63; --line:#26496e;
+  --txt:#e6edf5; --mut:#9fb1c4; --acc:#c9a227; --acc-lt:#e3c563; --ok:#3ddc84; --warn:#ffb454; --bad:#ff6b6b;
+  --mono:'Consolas','SF Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif;min-height:100vh}
+header{padding:18px 28px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header h1{font-size:21px;font-weight:600;font-family:'Fraunces',Georgia,serif}
+header h1 span{color:var(--acc)}
+.codesel{margin-left:auto;display:flex;gap:8px;align-items:center}
+.codesel label{color:var(--mut);font-size:13px}
+.codebtn{padding:8px 16px;border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.codebtn.active{background:var(--acc);border-color:var(--acc);color:#08111f}
+nav{display:flex;gap:6px;padding:14px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{padding:9px 20px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--mut);cursor:pointer;font-size:14px;font-weight:600}
+.tab.active{background:var(--panel2);color:var(--txt);border-color:var(--acc)}
+main{display:grid;grid-template-columns:400px 1fr;gap:22px;padding:22px 28px;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{font-size:15px;margin-bottom:14px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px}
+.grp{margin-bottom:12px}
+.grp label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:4px}
+.grp input,.grp select{width:100%;padding:9px 10px;background:#0d1322;border:1px solid var(--line);border-radius:7px;color:var(--txt);font-size:14px;font-family:var(--mono)}
+.grp input:focus,.grp select:focus{outline:none;border-color:var(--acc)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11.5px;color:var(--mut);margin-top:3px}
+.btn{width:100%;padding:12px;background:var(--acc);color:#08111f;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn:hover{filter:brightness(1.1)}
+.results{min-height:200px}
+.res-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+.res-box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px}
+.res-box .k{font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.res-box .v{font-size:19px;font-weight:700;margin-top:4px;font-family:var(--mono)}
+.res-box .v small{font-size:12px;color:var(--mut);font-weight:400}
+.steps{background:#0d1322;border:1px solid var(--line);border-radius:10px;padding:16px;font-family:var(--mono);font-size:13px;line-height:1.85;white-space:pre-wrap;color:#c9d6ee}
+.steps .h{color:var(--acc);font-weight:700}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.placeholder{color:var(--mut);font-size:14px;padding:40px;text-align:center}
+.draw{margin-bottom:18px;background:#0d1322;border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:flex-start}
+.draw svg{overflow:visible}
+.conc{fill:#1b3f63;stroke:#8fa8c8;stroke-width:1.5}
+.soil{fill:#1a2236;stroke:#55648a;stroke-width:1;stroke-dasharray:4 3}
+.bar{fill:#e3c563;stroke:#c9a227;stroke-width:.8}
+.stir{fill:none;stroke:#8fa8c8;stroke-width:2}
+.barln{stroke:#e3c563;stroke-width:2.5;fill:none}
+.dim{stroke:#8fa0bf;stroke-width:1}
+.dtxt{fill:#8fa0bf;font:11px Consolas,monospace}
+.lbl{fill:#e8edf7;font:11.5px Consolas,monospace}
+.ttl{fill:#e3c563;font:600 12px 'Inter',sans-serif}
+.ldr{stroke:#66779c;stroke-width:.8}
+footer{padding:16px 28px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);line-height:1.6}
+.pane{display:none}.pane.show{display:contents}
+
+.hub-back{font-size:13px;color:var(--mut);text-decoration:none;border:1px solid var(--line);padding:5px 12px;border-radius:7px}
+.hub-back:hover{border-color:var(--acc);color:var(--acc-lt)}
+.site-back{font-size:13px;font-weight:600;color:var(--acc-lt);text-decoration:none;border:1px solid rgba(227,197,99,.5);padding:6px 16px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;margin-left:8px}
+.site-back:hover{background:var(--acc-lt);color:#0e2238}
+</style>
+</head>
+<body>
+<header>
+  <a class="hub-back" href="../fea-online.html" title="Back to FEA hub">← FEA</a>
+  <h1>RC <span>Design Studio</span> — Reinforced Concrete Element Design</h1>
+  <div class="codesel">
+    <label>Design Code:</label>
+    <button class="codebtn active" data-code="ECP" onclick="setCode('ECP',this)">ECP 203 (Egypt)</button>
+    <button class="codebtn" data-code="SBC" onclick="setCode('SBC',this)">SBC 304 (Saudi)</button>
+    <button class="codebtn" data-code="ACI" onclick="setCode('ACI',this)">ACI 318 (USA)</button>
+  </div>
+  <a class="site-back" href="../index.html">← Back to website</a>
+</header>
+<nav>
+  <button class="tab active" onclick="setTab('beam',this)">Beams</button>
+  <button class="tab" onclick="setTab('slab',this)">Slabs</button>
+  <button class="tab" onclick="setTab('col',this)">Columns</button>
+  <button class="tab" onclick="setTab('wall',this)">Walls</button>
+  <button class="tab" onclick="setTab('foot',this)">Footings</button>
+</nav>
+
+<main>
+<!-- ================= BEAM ================= -->
+<div class="pane show" id="pane-beam">
+  <div class="card">
+    <h2>Beam — Inputs</h2>
+    <div class="row2">
+      <div class="grp"><label>Concrete strength <span class="fculab">fcu</span> (N/mm²)</label><input id="bm_fc" type="number" value="30"></div>
+      <div class="grp"><label>Steel yield fy (N/mm²)</label><input id="bm_fy" type="number" value="400"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Ultimate moment Mu (kN·m)</label><input id="bm_mu" type="number" value="220"></div>
+      <div class="grp"><label>Ultimate shear Vu (kN)</label><input id="bm_vu" type="number" value="180"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Width b (mm)</label><input id="bm_b" type="number" value="250"></div>
+      <div class="grp"><label>Total depth h (mm)</label><input id="bm_h" type="number" placeholder="auto"><div class="hint">Leave empty → auto-sized</div></div>
+    </div>
+    <div class="grp"><label>Cover to bar center d' (mm)</label><input id="bm_cov" type="number" value="50"></div>
+    <button class="btn" onclick="designBeam()">Design Beam</button>
+  </div>
+  <div class="card results" id="bm_out"><div class="placeholder">Enter loads and press Design.</div></div>
+</div>
+
+<!-- ================= SLAB ================= -->
+<div class="pane" id="pane-slab">
+  <div class="card">
+    <h2>One-way Solid Slab — Inputs</h2>
+    <div class="row2">
+      <div class="grp"><label>Concrete <span class="fculab">fcu</span> (N/mm²)</label><input id="sl_fc" type="number" value="30"></div>
+      <div class="grp"><label>Steel fy (N/mm²)</label><input id="sl_fy" type="number" value="400"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Clear span L (m)</label><input id="sl_L" type="number" value="4.0" step="0.1"></div>
+      <div class="grp"><label>Support condition</label>
+        <select id="sl_sup">
+          <option value="ss">Simply supported</option>
+          <option value="c1" selected>Continuous — one end</option>
+          <option value="c2">Continuous — both ends</option>
+          <option value="cant">Cantilever</option>
+        </select></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Dead load DL excl. self wt (kN/m²)</label><input id="sl_dl" type="number" value="3.0" step="0.1"></div>
+      <div class="grp"><label>Live load LL (kN/m²)</label><input id="sl_ll" type="number" value="2.0" step="0.1"></div>
+    </div>
+    <div class="grp"><label>Thickness ts (mm)</label><input id="sl_t" type="number" placeholder="auto"><div class="hint">Leave empty → from code min. thickness</div></div>
+    <button class="btn" onclick="designSlab()">Design Slab</button>
+  </div>
+  <div class="card results" id="sl_out"><div class="placeholder">Enter data and press Design.</div></div>
+</div>
+
+<!-- ================= COLUMN ================= -->
+<div class="pane" id="pane-col">
+  <div class="card">
+    <h2>Short Tied Column — Inputs</h2>
+    <div class="row2">
+      <div class="grp"><label>Concrete <span class="fculab">fcu</span> (N/mm²)</label><input id="co_fc" type="number" value="30"></div>
+      <div class="grp"><label>Steel fy (N/mm²)</label><input id="co_fy" type="number" value="400"></div>
+    </div>
+    <div class="grp"><label>Ultimate axial load Pu (kN)</label><input id="co_pu" type="number" value="2200"></div>
+    <div class="row2">
+      <div class="grp"><label>b (mm)</label><input id="co_b" type="number" placeholder="auto"></div>
+      <div class="grp"><label>h (mm)</label><input id="co_h" type="number" placeholder="auto"></div>
+    </div>
+    <div class="grp"><label>Target steel ratio μ (%)</label><input id="co_mu" type="number" value="1.0" step="0.1"><div class="hint">Used when auto-sizing (ECP 0.8–4% · ACI/SBC 1–8%)</div></div>
+    <button class="btn" onclick="designColumn()">Design Column</button>
+  </div>
+  <div class="card results" id="co_out"><div class="placeholder">Enter data and press Design.</div></div>
+</div>
+
+<!-- ================= WALL ================= -->
+<div class="pane" id="pane-wall">
+  <div class="card">
+    <h2>Bearing / Shear Wall — Inputs</h2>
+    <div class="row2">
+      <div class="grp"><label>Concrete <span class="fculab">fcu</span> (N/mm²)</label><input id="wa_fc" type="number" value="30"></div>
+      <div class="grp"><label>Steel fy (N/mm²)</label><input id="wa_fy" type="number" value="400"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Ultimate axial Pu (kN)</label><input id="wa_pu" type="number" value="3000"></div>
+      <div class="grp"><label>Wall length Lw (m)</label><input id="wa_lw" type="number" value="3.0" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Thickness t (mm)</label><input id="wa_t" type="number" value="200"></div>
+      <div class="grp"><label>Unsupported height hs (m)</label><input id="wa_hs" type="number" value="3.0" step="0.1"></div>
+    </div>
+    <button class="btn" onclick="designWall()">Design Wall</button>
+  </div>
+  <div class="card results" id="wa_out"><div class="placeholder">Enter data and press Design.</div></div>
+</div>
+
+<!-- ================= FOOTING ================= -->
+<div class="pane" id="pane-foot">
+  <div class="card">
+    <h2>Isolated Footing — Inputs</h2>
+    <div class="row2">
+      <div class="grp"><label>Concrete <span class="fculab">fcu</span> (N/mm²)</label><input id="ft_fc" type="number" value="30"></div>
+      <div class="grp"><label>Steel fy (N/mm²)</label><input id="ft_fy" type="number" value="400"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Service load Ps (kN)</label><input id="ft_ps" type="number" value="1500"></div>
+      <div class="grp"><label>Ultimate load Pu (kN)</label><input id="ft_pu" type="number" value="2100"></div>
+    </div>
+    <div class="row2">
+      <div class="grp"><label>Column b × h (mm)</label>
+        <div class="row2"><input id="ft_cb" type="number" value="300"><input id="ft_ch" type="number" value="600"></div></div>
+      <div class="grp"><label>Allowable soil qall (kN/m²)</label><input id="ft_qa" type="number" value="200"></div>
+    </div>
+    <div class="grp"><label>Footing thickness t (mm)</label><input id="ft_t" type="number" placeholder="auto"><div class="hint">Leave empty → sized for shear/punching</div></div>
+    <button class="btn" onclick="designFooting()">Design Footing</button>
+  </div>
+  <div class="card results" id="ft_out"><div class="placeholder">Enter data and press Design.</div></div>
+</div>
+</main>
+
+<footer>
+<b>References:</b> ECP 203 — Egyptian Code for Design &amp; Construction of Concrete Structures (γc = 1.5, γs = 1.15, stress block 0.67·fcu/γc) ·
+SBC 304 — Saudi Building Code for Concrete Structures (based on ACI 318, φ factors: flexure 0.90, shear 0.75, tied compression 0.65) ·
+ACI 318-19 — Building Code Requirements for Structural Concrete.
+<br><b>Notes:</b> ECP uses cube strength fcu; ACI/SBC use cylinder strength f′c (f′c ≈ 0.8 fcu). Tools cover short columns and gravity design of typical elements; slenderness, seismic detailing, torsion and biaxial bending are outside this scope. Results are educational — a licensed engineer must review before construction use.
+</footer>
+
+<script>
+/* ================= GLOBAL STATE ================= */
+let CODE='ECP';
+function setCode(c,btn){CODE=c;document.querySelectorAll('.codebtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.querySelectorAll('.fculab').forEach(e=>e.textContent = c==='ECP' ? 'fcu' : "f'c");}
+function setTab(t,btn){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('show'));document.getElementById('pane-'+t).classList.add('show');}
+
+/* ================= HELPERS ================= */
+const PI=Math.PI;
+const fmt=(x,d=1)=>Number(x).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:0});
+const barA=d=>PI*d*d/4;
+const num=id=>{const v=document.getElementById(id).value;return v===''?null:parseFloat(v);};
+function pickBars(AsReq,bWidth,evenOnly){ // beams/columns: n bars of one diameter
+  const dias=[12,16,18,20,22,25,28,32];
+  let best=null;
+  for(const dia of dias){
+    for(let n=(evenOnly?4:2);n<=10;n+=(evenOnly?2:1)){
+      const area=n*barA(dia);
+      if(area<AsReq)continue;
+      const minW = n*dia + (n-1)*25 + 80;    // single layer width
+      if(bWidth && minW>bWidth*2)continue;   // allow up to 2 layers
+      const score = area/AsReq + 0.02*n + (bWidth&&minW>bWidth?0.05:0);
+      if(!best||score<best.score)best={n,dia,area,score};
+    }
+  }
+  return best||{n:10,dia:32,area:10*barA(32)};
+}
+function pickMesh(AsReq_per_m,maxS=200){ // slabs/footings: dia @ spacing per meter
+  const dias=[10,12,16,18,20];
+  for(const dia of dias){
+    let s=Math.floor(1000*barA(dia)/AsReq_per_m/25)*25;
+    if(s>=100){ s=Math.min(s,maxS); return {dia,s,area:1000*barA(dia)/s}; }
+  }
+  const dia=20;let s=Math.max(Math.floor(1000*barA(dia)/AsReq_per_m/25)*25,75);
+  return {dia,s,area:1000*barA(dia)/s};
+}
+function box(k,v,unit){return `<div class="res-box"><div class="k">${k}</div><div class="v">${v} <small>${unit||''}</small></div></div>`;}
+function render(el,boxes,steps,svg){document.getElementById(el).innerHTML=
+  `<h2>Results — ${CODE==='ECP'?'ECP 203':CODE==='SBC'?'SBC 304':'ACI 318-19'}</h2>
+   <div class="res-summary">${boxes.join('')}</div>
+   ${svg?`<div class="draw">${svg}</div>`:''}
+   <div class="steps">${steps.join('\n')}</div>`;}
+
+/* ================= SVG DRAWING HELPERS ================= */
+function svgO(w,h){return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto">`;}
+function dimH(x1,x2,y,t){return `<line class="dim" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/><line class="dim" x1="${x1}" y1="${y-4}" x2="${x1}" y2="${y+4}"/><line class="dim" x1="${x2}" y1="${y-4}" x2="${x2}" y2="${y+4}"/><text class="dtxt" x="${(x1+x2)/2}" y="${y+14}" text-anchor="middle">${t}</text>`;}
+function dimV(x,y1,y2,t){return `<line class="dim" x1="${x}" y1="${y1}" x2="${x}" y2="${y2}"/><line class="dim" x1="${x-4}" y1="${y1}" x2="${x+4}" y2="${y1}"/><line class="dim" x1="${x-4}" y1="${y2}" x2="${x+4}" y2="${y2}"/><text class="dtxt" transform="rotate(-90 ${x-7} ${(y1+y2)/2})" x="${x-7}" y="${(y1+y2)/2}" text-anchor="middle">${t}</text>`;}
+function label(x,y,t,lx,ly){return `<line class="ldr" x1="${lx}" y1="${ly}" x2="${x-4}" y2="${y-3}"/><text class="lbl" x="${x}" y="${y}">${t}</text>`;}
+function rowXs(k,xa,xb){const xs=[];for(let i=0;i<k;i++)xs.push(k===1?(xa+xb)/2:xa+(xb-xa)*i/(k-1));return xs;}
+
+// Rectangular beam / column cross-section
+function svgRectSec(title,b,h,bot,top,stir,isCol){
+  const sc=Math.min(190/b,240/h), W=b*sc, H=h*sc, x0=52, y0=34;
+  const ins=Math.max(25*sc,7);
+  let s=svgO(x0+W+150,y0+H+52);
+  s+=`<text class="ttl" x="${x0}" y="16">${title}</text>`;
+  s+=`<rect class="conc" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
+  s+=`<rect class="stir" rx="7" x="${x0+ins}" y="${y0+ins}" width="${W-2*ins}" height="${H-2*ins}"/>`;
+  const lx=x0+W+26; let out='';
+  if(isCol){
+    const wi=W-2*ins-8, hi=H-2*ins-8, ox=x0+ins+4, oy=y0+ins+4;
+    const r=Math.max(bot.dia*sc/2,4);
+    const pts=[[0,0],[wi,0],[wi,hi],[0,hi]];
+    let rem=bot.n-4;
+    const sides=[[[0,0],[wi,0]],[[0,hi],[wi,hi]],[[wi,0],[wi,hi]],[[0,0],[0,hi]]]
+      .map((sd,i)=>({sd,len:i<2?wi:hi})).sort((a,b2)=>b2.len-a.len);
+    const cnt=[0,0,0,0]; let i=0; while(rem>0){cnt[i%4]++;rem--;i++;}
+    sides.forEach((so,j)=>{for(let k2=1;k2<=cnt[j];k2++){const t=k2/(cnt[j]+1);
+      pts.push([so.sd[0][0]+(so.sd[1][0]-so.sd[0][0])*t, so.sd[0][1]+(so.sd[1][1]-so.sd[0][1])*t]);}});
+    pts.slice(0,bot.n).forEach(p=>{s+=`<circle class="bar" cx="${ox+p[0]}" cy="${oy+p[1]}" r="${r}"/>`;});
+    out+=label(lx,y0+ins+8,`${bot.n} Ø${bot.dia}`,x0+W-ins-4,y0+ins+4);
+    if(stir)out+=label(lx,y0+H/2,`ties Ø${stir.dia} @ ${stir.s}`,x0+W-ins,y0+H/2-3);
+  }else{
+    const r=Math.max(bot.dia*sc/2,4), xa=x0+ins+r+2, xb=x0+W-ins-r-2;
+    const nfit=Math.max(2,Math.floor((xb-xa)/(2*r+6))+1);
+    const n1=Math.min(bot.n,nfit), n2=bot.n-n1;
+    const yb1=y0+H-ins-r-2, yb2=yb1-(2*r+7);
+    rowXs(n1,xa,xb).forEach(x=>{s+=`<circle class="bar" cx="${x}" cy="${yb1}" r="${r}"/>`;});
+    if(n2>0)rowXs(n2,xa,xb).forEach(x=>{s+=`<circle class="bar" cx="${x}" cy="${yb2}" r="${r}"/>`;});
+    const tN=top?top.n:2, tD=top?top.dia:12, rt=Math.max(tD*sc/2,3.5);
+    rowXs(tN,xa,xb).forEach(x=>{s+=`<circle class="bar" cx="${x}" cy="${y0+ins+rt+2}" r="${rt}"/>`;});
+    out+=label(lx,y0+H-ins-2,`${bot.n} Ø${bot.dia}`,xb,yb1);
+    out+=label(lx,y0+ins+10,top?`${top.n} Ø${top.dia}`:`2 Ø12 hangers`,xb,y0+ins+rt+2);
+    if(stir)out+=label(lx,y0+H/2,`stirrups Ø${stir.dia} @ ${stir.s}`,x0+W-ins,y0+H/2-3);
+  }
+  s+=out;
+  s+=dimH(x0,x0+W,y0+H+22,`b = ${b} mm`);
+  s+=dimV(x0-16,y0,y0+H,`h = ${h} mm`);
+  return s+'</svg>';
+}
+
+// One-way slab strip section
+function svgSlabSec(t,mesh,mesh2){
+  const shown=700, sc=0.6, W=shown*sc, H=Math.max(t*sc,40), x0=40, y0=34;
+  let s=svgO(x0+W+150,y0+H+56);
+  s+=`<text class="ttl" x="${x0}" y="16">Slab section (1 m strip)</text>`;
+  s+=`<rect class="conc" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
+  const yb=y0+H-14, r=Math.max(mesh.dia*sc/2,3.5);
+  const nb=Math.floor(shown/mesh.s);
+  const xs=[];for(let i=0;i<=nb;i++){const x=x0+12+i*mesh.s*sc;if(x<x0+W-10)xs.push(x);}
+  s+=`<line class="barln" x1="${x0+8}" y1="${yb-r-4}" x2="${x0+W-8}" y2="${yb-r-4}"/>`;
+  xs.forEach(x=>{s+=`<circle class="bar" cx="${x}" cy="${yb}" r="${r}"/>`;});
+  const lx=x0+W+22;
+  s+=label(lx,yb+4,`main Ø${mesh.dia} @ ${mesh.s}`,xs[xs.length-1],yb);
+  s+=label(lx,yb-r-8,`sec. Ø${mesh2.dia} @ ${mesh2.s}`,x0+W-8,yb-r-4);
+  if(xs.length>1)s+=dimH(xs[0],xs[1],y0+H+20,`${mesh.s} mm`);
+  s+=dimV(x0-16,y0,y0+H,`ts = ${t} mm`);
+  return s+'</svg>';
+}
+
+// Wall plan section
+function svgWallPlan(t,mv,mh,ef){
+  const shown=1100, sc=0.4, W=shown*sc, H=Math.max(t*sc,44), x0=40, y0=34;
+  let s=svgO(x0+W+160,y0+H+40);
+  s+=`<text class="ttl" x="${x0}" y="16">Wall — plan section</text>`;
+  s+=`<rect class="conc" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
+  const r=Math.max(mv.dia*sc/2,3), faces=ef?[y0+10,y0+H-10]:[y0+H/2];
+  faces.forEach(y=>{
+    s+=`<line class="barln" x1="${x0+6}" y1="${y+(y<y0+H/2?4:-4)}" x2="${x0+W-6}" y2="${y+(y<y0+H/2?4:-4)}"/>`;
+    for(let x=x0+14;x<x0+W-8;x+=mv.s*sc)s+=`<circle class="bar" cx="${x}" cy="${y}" r="${r}"/>`;
+  });
+  const lx=x0+W+22;
+  s+=label(lx,y0+12,`vert. Ø${mv.dia} @ ${mv.s}${ef?' E.F.':''}`,x0+W-10,faces[0]);
+  s+=label(lx,y0+H-4,`horiz. Ø${mh.dia} @ ${mh.s}${ef?' E.F.':''}`,x0+W-6,faces[faces.length-1]+(ef?-4:4));
+  s+=dimV(x0-16,y0,y0+H,`t = ${t} mm`);
+  return s+'</svg>';
+}
+
+// Footing plan + section
+function svgFooting(Bm,Lm,t,cb,ch,meshL,meshB){
+  const Bmm=Bm*1000,Lmm=Lm*1000;
+  const sc=Math.min(280/Lmm,190/Bmm), W=Lmm*sc, H=Bmm*sc, x0=52, y0=34;
+  // --- plan ---
+  let s=svgO(x0+W+40,y0+H+50);
+  s+=`<text class="ttl" x="${x0}" y="16">Footing — plan</text>`;
+  s+=`<rect class="conc" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
+  for(let x=x0+meshL.s*sc;x<x0+W-2;x+=meshL.s*sc)s+=`<line x1="${x}" y1="${y0+3}" x2="${x}" y2="${y0+H-3}" stroke="#c9a227" stroke-width="1" opacity=".55"/>`;
+  for(let y=y0+meshB.s*sc;y<y0+H-2;y+=meshB.s*sc)s+=`<line x1="${x0+3}" y1="${y}" x2="${x0+W-3}" y2="${y}" stroke="#c9a227" stroke-width="1" opacity=".55"/>`;
+  s+=`<rect x="${x0+W/2-ch*sc/2}" y="${y0+H/2-cb*sc/2}" width="${ch*sc}" height="${cb*sc}" fill="#0d1322" stroke="#e8edf7" stroke-width="1.5"/>`;
+  s+=dimH(x0,x0+W,y0+H+20,`L = ${fmt(Lm,2)} m`);
+  s+=dimV(x0-16,y0,y0+H,`B = ${fmt(Bm,2)} m`);
+  s+='</svg>';
+  // --- section ---
+  const Hs=Math.max(t*sc,42), y1=40, colH=34;
+  let s2=svgO(x0+W+165,y1+colH+Hs+52);
+  s2+=`<text class="ttl" x="${x0}" y="16">Footing — section</text>`;
+  s2+=`<rect class="soil" x="${x0-14}" y="${y1+colH}" width="${W+28}" height="${Hs+16}"/>`;
+  s2+=`<rect class="conc" x="${x0}" y="${y1+colH}" width="${W}" height="${Hs}"/>`;
+  s2+=`<rect class="conc" x="${x0+W/2-ch*sc/2}" y="${y1}" width="${ch*sc}" height="${colH+2}"/>`;
+  const yb=y1+colH+Hs-12, r=Math.max(meshB.dia*sc/2,3.5);
+  s2+=`<line class="barln" x1="${x0+10}" y1="${yb}" x2="${x0+W-10}" y2="${yb}"/>`;
+  for(let x=x0+16;x<x0+W-10;x+=meshB.s*sc)s2+=`<circle class="bar" cx="${x}" cy="${yb+r+3}" r="${r}"/>`;
+  const lx=x0+W+22;
+  s2+=label(lx,yb-4,`long Ø${meshL.dia} @ ${meshL.s}`,x0+W-10,yb);
+  s2+=label(lx,yb+14,`short Ø${meshB.dia} @ ${meshB.s}`,x0+W-16,yb+r+3);
+  s2+=dimV(x0-16,y1+colH,y1+colH+Hs,`t = ${t} mm`);
+  s2+=dimH(x0,x0+W,y1+colH+Hs+26,`L = ${fmt(Lm,2)} m`);
+  s2+='</svg>';
+  return s+s2;
+}
+
+/* ================= CODE PARAMETERS ================= */
+// ECP 203: cmax/d by fy
+function ecpCmax(fy){ if(fy<=240)return .50; if(fy<=280)return .48; if(fy<=360)return .44; return .42; }
+// ACI/SBC: beta1
+function beta1(fc){ return Math.max(.65, Math.min(.85, .85-.05*(fc-28)/7)); }
+
+/* ---- Flexure per 1 section: returns {As, AsP(compression), dReq?, steps[]} ----
+   ECP: Mu = 0.67(fcu/1.5)·b·a·(d−a/2), fyd=fy/1.15
+   ACI/SBC: Rn=Mu/(φbd²), ρ=0.85f'c/fy(1−√(1−2Rn/0.85f'c)), φ=0.9 tension-controlled */
+function flexure(Mu_kNm,b,d,fc,fy,dP,steps,isSlab){
+  const Mu=Mu_kNm*1e6; let As=0, AsP=0, warn=null;
+  if(CODE==='ECP'){
+    const fcd=0.67*fc/1.5, fyd=fy/1.15;
+    const cmax=ecpCmax(fy), wmax=0.8*cmax;
+    const Rmax=(fcd/fc)*wmax*(1-wmax/2)*fc; // = fcd·wmax(1−wmax/2)
+    const MuMax=Rmax*b*d*d;
+    steps.push(`<span class="h">Flexural design (ECP 203)</span>`);
+    steps.push(`fcd = 0.67·fcu/γc = 0.67×${fc}/1.5 = ${fmt(fcd,2)} N/mm² ;  fyd = fy/γs = ${fmt(fyd,1)} N/mm²`);
+    steps.push(`c_max/d = ${cmax} (fy=${fy})  →  Mu,max = ${fmt(MuMax/1e6,1)} kN·m`);
+    const R=Mu/(b*d*d);
+    if(Mu<=MuMax){
+      const w=1-Math.sqrt(Math.max(0,1-2*(Mu/(fcd*b*d*d)))); const a=w*d;
+      As=fcd*b*a/fyd;
+      steps.push(`a/d = 1−√(1−2Mu/(fcd·b·d²)) = ${fmt(w,4)}  →  a = ${fmt(a,1)} mm`);
+      steps.push(`As = fcd·b·a/fyd = ${fmt(As,0)} mm²`);
+    }else{
+      const a=wmax*d, As1=fcd*b*a/fyd, M2=Mu-MuMax;
+      AsP=M2/(fyd*(d-dP)); As=As1+AsP;
+      steps.push(`Mu &gt; Mu,max → <span class="warn">doubly reinforced section</span>`);
+      steps.push(`As1 = ${fmt(As1,0)} mm² ;  M2 = ${fmt(M2/1e6,1)} kN·m ;  As' = M2/(fyd(d−d')) = ${fmt(AsP,0)} mm²`);
+      steps.push(`As = As1 + As' = ${fmt(As,0)} mm²`);
+    }
+    const Asmin = isSlab ? 0.6/fy*1000*d : Math.max(0.225*Math.sqrt(fc)/fy, 1.1/fy)*b*d;
+    if(As<Asmin){steps.push(`As &lt; As,min = ${fmt(Asmin,0)} mm² → <span class="warn">use As,min</span>`);As=Asmin;}
+    else steps.push(`As,min = ${fmt(Asmin,0)} mm² ✓`);
+  }else{
+    const phi=0.9, b1=beta1(fc);
+    const rho_t=0.85*b1*(fc/fy)*(0.003/(0.003+0.005)); // tension-controlled limit εt=0.005
+    const Rn=Mu/(phi*b*d*d);
+    const Rn_max=rho_t*fy*(1-rho_t*fy/(1.7*fc));
+    steps.push(`<span class="h">Flexural design (${CODE==='SBC'?'SBC 304':'ACI 318-19'})</span>`);
+    steps.push(`φ = 0.90 ;  β1 = ${fmt(b1,3)} ;  ρ_t (εt=0.005) = ${fmt(rho_t*100,3)} %`);
+    steps.push(`Rn = Mu/(φ·b·d²) = ${fmt(Rn,3)} N/mm²  (Rn,max = ${fmt(Rn_max,3)})`);
+    if(Rn<=Rn_max){
+      const rho=0.85*fc/fy*(1-Math.sqrt(Math.max(0,1-2*Rn/(0.85*fc))));
+      As=rho*b*d;
+      steps.push(`ρ = 0.85f'c/fy·(1−√(1−2Rn/0.85f'c)) = ${fmt(rho*100,3)} %  →  As = ${fmt(As,0)} mm²`);
+    }else{
+      const As1=rho_t*b*d;
+      const Mn1=As1*fy*(d-As1*fy/(1.7*fc*b));
+      const M2=Mu/phi-Mn1;
+      AsP=M2/(fy*(d-dP)); As=As1+AsP;
+      steps.push(`Rn &gt; Rn,max → <span class="warn">doubly reinforced section</span>`);
+      steps.push(`As1 = ${fmt(As1,0)} mm² ; As' = ${fmt(AsP,0)} mm² ; As = ${fmt(As,0)} mm²`);
+    }
+    const Asmin = isSlab ? 0.0018*1000*(d+dP) : Math.max(0.25*Math.sqrt(fc)/fy,1.4/fy)*b*d;
+    if(As<Asmin){steps.push(`As &lt; As,min = ${fmt(Asmin,0)} mm² → <span class="warn">use As,min</span>`);As=Asmin;}
+    else steps.push(`As,min = ${fmt(Asmin,0)} mm² ✓`);
+  }
+  return {As,AsP};
+}
+
+/* ================= BEAM ================= */
+function designBeam(){
+  const fc=num('bm_fc'),fy=num('bm_fy'),Mu=num('bm_mu'),Vu=num('bm_vu')||0,bIn=num('bm_b'),cov=num('bm_cov')||50;
+  let b=bIn||250, h=num('bm_h'), steps=[];
+  steps.push(`<span class="h">1) Section sizing</span>`);
+  if(!h){ // auto-size for R ≈ 0.65·Rmax / Rn ≈ 0.65·Rn,max
+    let dReq;
+    if(CODE==='ECP'){
+      const fcd=0.67*fc/1.5,w=0.8*ecpCmax(fy),Rm=fcd*w*(1-w/2);
+      dReq=Math.sqrt(Mu*1e6/(0.65*Rm*b));
+    }else{
+      const b1=beta1(fc),rt=0.85*b1*fc/fy*0.375,Rm=rt*fy*(1-rt*fy/(1.7*fc));
+      dReq=Math.sqrt(Mu*1e6/(0.9*0.65*Rm*b));
+    }
+    h=Math.ceil((dReq+cov)/50)*50;
+    steps.push(`h not given → required d ≈ ${fmt(dReq,0)} mm → take h = ${h} mm`);
+  } else steps.push(`Given section: ${b} × ${h} mm`);
+  const d=h-cov;
+  steps.push(`Effective depth d = h − d' = ${fmt(d,0)} mm`);
+  steps.push('');
+  const f=flexure(Mu,b,d,fc,fy,cov,steps,false);
+  const bars=pickBars(f.As,b);
+  let compBars=null;
+  if(f.AsP>0) compBars=pickBars(f.AsP,b);
+  steps.push('');
+  // ---- shear ----
+  steps.push(`<span class="h">Shear design</span>`);
+  let shearTxt='—', stirr=null;
+  if(Vu>0){
+    if(CODE==='ECP'){
+      const qu=Vu*1e3/(b*d), qcu=0.24*Math.sqrt(fc/1.5), qumax=Math.min(0.7*Math.sqrt(fc/1.5),4);
+      steps.push(`qu = Vu/(b·d) = ${fmt(qu,2)} N/mm² ; qcu = 0.24√(fcu/1.5) = ${fmt(qcu,2)} ; qu,max = ${fmt(qumax,2)}`);
+      if(qu>qumax){steps.push(`<span class="bad">qu &gt; qu,max → enlarge section!</span>`);shearTxt='FAIL — enlarge';}
+      else{
+        const qsu=Math.max(qu-0.5*qcu, 0.4/(fy/1.15)*0+0); // stirrups take qu − qcu/2
+        const AstS=Math.max(qsu*b/(fy/1.15), 0.4/240*b); // min stirrups μmin=0.4/fy(240)
+        const Adia=8, twoLegs=2*barA(Adia);
+        let s=Math.floor(twoLegs/AstS/25)*25; s=Math.min(Math.max(s,100),200);
+        stirr={dia:Adia,s};
+        steps.push(`qsu = qu − qcu/2 = ${fmt(qsu,2)} N/mm² → Ast/s = ${fmt(AstS,3)} mm²/mm`);
+        steps.push(`Use φ${Adia} two-branch stirrups @ ${s} mm  (Ast/s provided = ${fmt(twoLegs/s,3)})`);
+        shearTxt=`Ø${Adia} @ ${s} mm`;
+      }
+    }else{
+      const phi=0.75, Vc=0.17*Math.sqrt(fc)*b*d/1e3;
+      steps.push(`φVc = 0.75×0.17√f'c·b·d = ${fmt(phi*Vc,1)} kN  (Vu = ${Vu} kN)`);
+      if(Vu<=0.5*phi*Vc){steps.push(`Vu &lt; φVc/2 → no stirrups required (min. detailing recommended)`);shearTxt='Min. stirrups';stirr={dia:10,s:Math.min(Math.floor(d/2/25)*25,300)};}
+      else{
+        const Vs=Math.max(Vu/phi-Vc,0);
+        const VsMax=0.66*Math.sqrt(fc)*b*d/1e3;
+        if(Vs>VsMax){steps.push(`<span class="bad">Vs &gt; 0.66√f'c·b·d → enlarge section!</span>`);shearTxt='FAIL — enlarge';}
+        else{
+          const AvS=Math.max(Vs*1e3/(fy*d), 0.062*Math.sqrt(fc)*b/fy, 0.35*b/fy);
+          const Adia=10,twoLegs=2*barA(Adia);
+          let s=Math.floor(twoLegs/AvS/25)*25;
+          const sMax=(Vs<=0.33*Math.sqrt(fc)*b*d/1e3)?Math.min(d/2,600):Math.min(d/4,300);
+          s=Math.min(Math.max(s,75),Math.floor(sMax/25)*25);
+          stirr={dia:Adia,s};
+          steps.push(`Vs = Vu/φ − Vc = ${fmt(Vs,1)} kN → Av/s = ${fmt(AvS,3)} mm²/mm`);
+          steps.push(`Use φ${Adia} two-leg stirrups @ ${s} mm`);
+          shearTxt=`Ø${Adia} @ ${s} mm`;
+        }
+      }
+    }
+  }
+  const boxes=[
+    box('Section',`${b}×${h}`,'mm'),
+    box('As required',fmt(f.As,0),'mm²'),
+    box('Bottom steel',`${bars.n} Ø${bars.dia}`,`= ${fmt(bars.area,0)} mm²`),
+    compBars?box("Top steel As'",`${compBars.n} Ø${compBars.dia}`,`= ${fmt(compBars.area,0)} mm²`):box('Top steel','2 Ø12','hangers'),
+    box('Stirrups',shearTxt,'')
+  ];
+  render('bm_out',boxes,steps,svgRectSec('Beam cross-section',b,h,bars,compBars,stirr,false));
+}
+
+/* ================= SLAB ================= */
+function designSlab(){
+  const fc=num('sl_fc'),fy=num('sl_fy'),L=num('sl_L'),dl=num('sl_dl'),ll=num('sl_ll'),sup=document.getElementById('sl_sup').value;
+  let t=num('sl_t'),steps=[];
+  const ratios = CODE==='ECP' ? {ss:30,c1:35,c2:40,cant:10} : {ss:20,c1:24,c2:28,cant:10};
+  const coef = {ss:8,c1:10,c2:12,cant:2}[sup];
+  steps.push(`<span class="h">1) Thickness</span>`);
+  if(!t){ t=Math.max(Math.ceil(L*1000/ratios[sup]/10)*10, 100);
+    steps.push(`Min. thickness = L/${ratios[sup]} = ${fmt(L*1000/ratios[sup],0)} mm → take ts = ${t} mm`);
+  } else steps.push(`Given ts = ${t} mm`);
+  const d=t-25;
+  const sw=t/1000*25;
+  const wu = CODE==='ECP' ? 1.4*(dl+sw)+1.6*ll : 1.2*(dl+sw)+1.6*ll;
+  steps.push(`Self weight = ${fmt(sw,2)} kN/m² ;  wu = ${CODE==='ECP'?'1.4DL+1.6LL':'1.2DL+1.6LL'} = ${fmt(wu,2)} kN/m²`);
+  const Mu=wu*L*L/coef;
+  steps.push(`Mu = wu·L²/${coef} = ${fmt(Mu,2)} kN·m/m`);
+  steps.push('');
+  const f=flexure(Mu,1000,d,fc,fy,25,steps,true);
+  const mesh=pickMesh(f.As);
+  const sec = CODE==='ECP'? 0.6/fy*1000*t : 0.0018*1000*t; // secondary/shrinkage
+  const mesh2=pickMesh(sec,250);
+  steps.push('');
+  steps.push(`<span class="h">Secondary / shrinkage steel</span>`);
+  steps.push(`As,sec = ${fmt(sec,0)} mm²/m → Ø${mesh2.dia} @ ${mesh2.s} mm`);
+  render('sl_out',[
+    box('Thickness ts',t,'mm'),
+    box('wu',fmt(wu,2),'kN/m²'),
+    box('Main steel',`Ø${mesh.dia} @ ${mesh.s}`,`mm  (${fmt(mesh.area,0)} mm²/m)`),
+    box('Secondary steel',`Ø${mesh2.dia} @ ${mesh2.s}`,'mm')
+  ],steps,svgSlabSec(t,mesh,mesh2));
+}
+
+/* ================= COLUMN ================= */
+function designColumn(){
+  const fc=num('co_fc'),fy=num('co_fy'),Pu=num('co_pu'),muT=(num('co_mu')||1)/100;
+  let b=num('co_b'),h=num('co_h'),steps=[];
+  const muMin = CODE==='ECP'?0.008:0.01, muMax=CODE==='ECP'?0.04:0.08;
+  const mu=Math.min(Math.max(muT,muMin),muMax);
+  steps.push(`<span class="h">1) Section sizing</span>`);
+  if(CODE==='ECP'){
+    steps.push(`ECP 203 tied short column: Pu = 0.35·fcu·Ac + 0.67·fy·Asc`);
+    if(!b||!h){
+      const Ag=Pu*1e3/(0.35*fc+0.67*fy*mu);
+      const side=Math.ceil(Math.sqrt(Ag)/50)*50;
+      b=b||Math.max(side,250); h=h||Math.max(Math.ceil((Ag/b)/50)*50,250);
+      steps.push(`Ag,req = Pu/(0.35fcu + 0.67fy·μ) = ${fmt(Ag,0)} mm² → take ${b}×${h}`);
+    }
+    const Ag=b*h;
+    let Asc=(Pu*1e3-0.35*fc*Ag)/(0.67*fy);
+    steps.push(`Asc = (Pu − 0.35fcu·Ag)/(0.67fy) = ${fmt(Asc,0)} mm²`);
+    const AsMin=muMin*Ag;
+    if(Asc<AsMin){steps.push(`Asc &lt; μmin·Ag = ${fmt(AsMin,0)} mm² → <span class="warn">use minimum (0.8%)</span>`);Asc=AsMin;}
+    if(Asc>muMax*Ag){steps.push(`<span class="bad">Asc &gt; 4% Ag → enlarge section!</span>`);}
+    finishColumn(b,h,Asc,Ag,fc,fy,Pu,steps,(Ag2,As2)=> (0.35*fc*Ag2+0.67*fy*As2)/1e3 );
+  }else{
+    steps.push(`${CODE==='SBC'?'SBC 304':'ACI 318-19'} tied short column: φPn,max = 0.80·φ[0.85f'c(Ag−Ast) + fy·Ast], φ = 0.65`);
+    const k=0.80*0.65;
+    if(!b||!h){
+      const Ag=Pu*1e3/(k*(0.85*fc*(1-mu)+fy*mu));
+      const side=Math.ceil(Math.sqrt(Ag)/50)*50;
+      b=b||Math.max(side,250); h=h||Math.max(Math.ceil((Ag/b)/50)*50,250);
+      steps.push(`Ag,req = Pu/(0.52[0.85f'c(1−μ)+fy·μ]) = ${fmt(Ag,0)} mm² → take ${b}×${h}`);
+    }
+    const Ag=b*h;
+    let Ast=(Pu*1e3/k-0.85*fc*Ag)/(fy-0.85*fc);
+    steps.push(`Ast = (Pu/0.52 − 0.85f'c·Ag)/(fy − 0.85f'c) = ${fmt(Ast,0)} mm²`);
+    const AsMin=0.01*Ag;
+    if(Ast<AsMin){steps.push(`Ast &lt; 1% Ag = ${fmt(AsMin,0)} mm² → <span class="warn">use minimum (1%)</span>`);Ast=AsMin;}
+    if(Ast>0.08*Ag){steps.push(`<span class="bad">Ast &gt; 8% Ag → enlarge section!</span>`);}
+    finishColumn(b,h,Ast,Ag,fc,fy,Pu,steps,(Ag2,As2)=> k*(0.85*fc*(Ag2-As2)+fy*As2)/1e3 );
+  }
+}
+function finishColumn(b,h,AsReq,Ag,fc,fy,Pu,steps,capFn){
+  const bars=pickBars(AsReq,Math.min(b,h),true); // even count ≥ 4 for symmetry
+  const cap=capFn(Ag,bars.area);
+  steps.push(`Provide ${bars.n} Ø${bars.dia} = ${fmt(bars.area,0)} mm²  (μ = ${fmt(bars.area/Ag*100,2)}%)`);
+  steps.push(`Capacity = ${fmt(cap,0)} kN ${cap>=Pu?'≥':'<'} Pu = ${Pu} kN  ${cap>=Pu?'<span class="ok">✓ SAFE</span>':'<span class="bad">✗ UNSAFE — increase steel/section</span>'}`);
+  steps.push('');
+  steps.push(`<span class="h">Ties</span>`);
+  let tieS, tieD=8;
+  if(CODE==='ECP'){ tieS=Math.min(15*bars.dia, Math.min(b,h), 200); steps.push(`s ≤ min(15·Øbar, least dim., 200) = ${fmt(tieS,0)} mm → Ø8 @ ${Math.floor(tieS/25)*25} mm`);}
+  else{ tieD=bars.dia>=32?12:10; tieS=Math.min(16*bars.dia,48*tieD,Math.min(b,h)); steps.push(`s ≤ min(16·Øbar, 48·Øtie, least dim.) = ${fmt(tieS,0)} mm → Ø${tieD} @ ${Math.floor(tieS/25)*25} mm`);}
+  render('co_out',[
+    box('Section',`${b}×${h}`,'mm'),
+    box('Longitudinal',`${bars.n} Ø${bars.dia}`,`= ${fmt(bars.area,0)} mm²`),
+    box('Steel ratio μ',fmt(bars.area/Ag*100,2),'%'),
+    box('Ties',`Ø${tieD} @ ${Math.floor(tieS/25)*25}`,'mm'),
+    box('Capacity',fmt(cap,0),`kN ${cap>=Pu?'✓':'✗'}`)
+  ],steps,svgRectSec('Column cross-section',b,h,bars,null,{dia:tieD,s:Math.floor(tieS/25)*25},true));
+}
+
+/* ================= WALL ================= */
+function designWall(){
+  const fc=num('wa_fc'),fy=num('wa_fy'),Pu=num('wa_pu'),Lw=num('wa_lw')*1000,t=num('wa_t'),hs=num('wa_hs')*1000;
+  const Ag=Lw*t;let steps=[];
+  steps.push(`<span class="h">1) Axial capacity (empirical wall method)</span>`);
+  let cap;
+  if(CODE==='ECP'){
+    // ECP simplified wall/column approach with buckling reduction
+    const lam=hs/t;
+    const red=Math.max(0,1-Math.pow(lam/32,2)*0.6); // conservative slenderness reduction
+    cap=0.35*fc*Ag*red/1e3;
+    steps.push(`λ = hs/t = ${fmt(lam,1)} ; capacity ≈ 0.35·fcu·Ag·(reduction ${fmt(red,2)}) = ${fmt(cap,0)} kN`);
+  }else{
+    const phi=0.65;
+    const k=0.8; // braced, restrained ends assumed
+    cap=0.55*phi*fc*Ag*(1-Math.pow(k*hs/(32*t),2))/1e3;
+    steps.push(`φPn = 0.55·φ·f'c·Ag·[1−(k·hs/32t)²]  (k=0.8) = ${fmt(cap,0)} kN`);
+  }
+  steps.push(`Pu = ${Pu} kN  ${cap>=Pu?'<span class="ok">✓ SAFE</span>':'<span class="bad">✗ increase thickness/length</span>'}`);
+  steps.push('');
+  steps.push(`<span class="h">2) Minimum reinforcement</span>`);
+  let rv,rh;
+  if(CODE==='ECP'){ rv=0.0025;rh=0.0025; steps.push(`ECP min: vertical 0.25%·Ag, horizontal 0.25%·Ag (each, distributed both faces for t ≥ 160 mm)`);}
+  else{ rv=0.0012;rh=0.0020; steps.push(`${CODE==='SBC'?'SBC':'ACI'} min (deformed ≤ Ø16, fy ≥ 420): ρv = 0.0012 , ρh = 0.0020`);}
+  const Asv=rv*t*1000, Ash=rh*t*1000;
+  const mv=pickMesh(Asv/( t>=160?2:1 ),300), mh=pickMesh(Ash/( t>=160?2:1 ),300);
+  steps.push(`Vertical As = ${fmt(Asv,0)} mm²/m → Ø${mv.dia} @ ${mv.s} mm ${t>=160?'(each face)':''}`);
+  steps.push(`Horizontal As = ${fmt(Ash,0)} mm²/m → Ø${mh.dia} @ ${mh.s} mm ${t>=160?'(each face)':''}`);
+  render('wa_out',[
+    box('Wall',`${fmt(Lw,0)}×${t}`,'mm'),
+    box('Capacity',fmt(cap,0),`kN ${cap>=Pu?'✓':'✗'}`),
+    box('Vertical steel',`Ø${mv.dia} @ ${mv.s}`,t>=160?'mm E.F.':'mm'),
+    box('Horizontal steel',`Ø${mh.dia} @ ${mh.s}`,t>=160?'mm E.F.':'mm')
+  ],steps,svgWallPlan(t,mv,mh,t>=160));
+}
+
+/* ================= FOOTING ================= */
+function designFooting(){
+  const fc=num('ft_fc'),fy=num('ft_fy'),Ps=num('ft_ps'),Pu=num('ft_pu'),cb=num('ft_cb'),ch=num('ft_ch'),qa=num('ft_qa');
+  let t=num('ft_t'),steps=[];
+  steps.push(`<span class="h">1) Plan dimensions (service loads)</span>`);
+  const Areq=1.05*Ps/qa;
+  steps.push(`A,req = 1.05·Ps/q_all = 1.05×${Ps}/${qa} = ${fmt(Areq,2)} m²  (5% own weight)`);
+  const diff=(ch-cb)/1000;
+  let B=Math.sqrt(Areq+diff*diff/4)-diff/2; B=Math.ceil(B*20)/20;
+  let Lf=B+diff; Lf=Math.ceil(Lf*20)/20;
+  steps.push(`Keep equal cantilevers: B×L = ${fmt(B,2)} × ${fmt(Lf,2)} m  (A = ${fmt(B*Lf,2)} m²)`);
+  const qu=Pu/(B*Lf);
+  steps.push(`Net ultimate pressure qu = Pu/A = ${fmt(qu,1)} kN/m²`);
+  steps.push('');
+  // thickness by punching + one-way shear
+  steps.push(`<span class="h">2) Thickness — punching &amp; one-way shear</span>`);
+  const cover=70;
+  const vcP = CODE==='ECP' ? 0.316*Math.sqrt(fc/1.5) : 0.75*0.33*Math.sqrt(fc);
+  const vc1 = CODE==='ECP' ? 0.16*Math.sqrt(fc/1.5)  : 0.75*0.17*Math.sqrt(fc);
+  steps.push(CODE==='ECP'
+    ?`qcp = 0.316√(fcu/γc) = ${fmt(vcP,2)} N/mm² ;  qc(one-way) = 0.16√(fcu/γc) = ${fmt(vc1,2)} N/mm²`
+    :`φvc(punch) = 0.75×0.33√f'c = ${fmt(vcP,2)} N/mm² ;  φvc(one-way) = 0.75×0.17√f'c = ${fmt(vc1,2)} N/mm²`);
+  function checks(d){ // d in mm → return {pOK,oOK,vp,vo}
+    const b0=2*((cb+d)+(ch+d));
+    const Vp=Pu*1e3-qu*1e-3*(cb+d)*(ch+d); // N
+    const vp=Vp/(b0*d);
+    const cant=(Lf*1000-ch)/2;
+    const Vo=qu*1e-3*B*1000*(cant-d); // N per full width B
+    const vo=Vo/(B*1000*d);
+    return {vp,vo,ok:vp<=vcP&&vo<=vc1};
+  }
+  if(!t){ let d=250; while(!checks(d).ok && d<2000) d+=50; t=Math.ceil((d+cover)/50)*50;
+    steps.push(`Iterating depth → d = ${t-cover} mm → t = ${t} mm`);
+  }
+  const d=t-cover;
+  const c=checks(d);
+  steps.push(`Punching @ d/2: v = ${fmt(c.vp,3)} ${c.vp<=vcP?'≤':'>'} ${fmt(vcP,2)} N/mm² ${c.vp<=vcP?'<span class="ok">✓</span>':'<span class="bad">✗ increase t</span>'}`);
+  steps.push(`One-way @ d:  v = ${fmt(Math.max(c.vo,0),3)} ${c.vo<=vc1?'≤':'>'} ${fmt(vc1,2)} N/mm² ${c.vo<=vc1?'<span class="ok">✓</span>':'<span class="bad">✗ increase t</span>'}`);
+  steps.push('');
+  steps.push(`<span class="h">3) Flexural reinforcement (at column face)</span>`);
+  const cantL=(Lf*1000-ch)/2/1000, cantB=(B*1000-cb)/2/1000;
+  const MuL=qu*cantL*cantL/2; // kN·m per meter (long dir)
+  const MuB=qu*cantB*cantB/2;
+  steps.push(`Long dir.:  Mu = qu·l²/2 = ${fmt(qu,1)}×${fmt(cantL,2)}²/2 = ${fmt(MuL,1)} kN·m/m`);
+  const fL=flexure(MuL,1000,d,fc,fy,cover,steps,true);
+  const meshL=pickMesh(fL.As);
+  steps.push('');
+  steps.push(`Short dir.: Mu = ${fmt(MuB,1)} kN·m/m`);
+  const fB=flexure(MuB,1000,d-16,fc,fy,cover,steps,true);
+  const meshB=pickMesh(fB.As);
+  render('ft_out',[
+    box('Plan',`${fmt(B,2)} × ${fmt(Lf,2)}`,'m'),
+    box('Thickness t',t,'mm'),
+    box('Long dir. steel',`Ø${meshL.dia} @ ${meshL.s}`,'mm'),
+    box('Short dir. steel',`Ø${meshB.dia} @ ${meshB.s}`,'mm'),
+    box('Punching',c.vp<=vcP?'SAFE ✓':'CHECK ✗','')
+  ],steps,svgFooting(B,Lf,t,cb,ch,meshL,meshB));
+}
+</script>
+</body>
+</html>
