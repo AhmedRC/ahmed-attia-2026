@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC-Floor-FEA — Reinforced Concrete Floor Analysis & Design</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- pdf.js for PDF underlay import (CDN; app works without it except PDF import) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<!-- ======================= TOP BAR ======================= -->
+<header id="topbar">
+  <a href="../fea-online.html" class="site-back" title="Back to FEA hub">← FEA</a>
+  <div class="brand">RC-Floor-FEA <span class="ver">v1.0</span></div>
+
+  <div class="tb-group">
+    <button id="btnNew"  title="New project">New</button>
+    <button id="btnOpen" title="Open project (.json)">Open</button>
+    <button id="btnSave" title="Save project (.json)">Save</button>
+    <button id="btnExample" title="Load built-in example" class="accent2">Example</button>
+  </div>
+
+  <div class="tb-group">
+    <button id="btnUnderlay" title="Import PDF / DXF / image underlay">Underlay…</button>
+    <button id="btnCalib" title="Calibrate underlay scale (pick 2 points)">Scale</button>
+  </div>
+
+  <div class="tb-group workflow">
+    <button id="btnMesh"    class="step">1&nbsp;Mesh</button>
+    <button id="btnAnalyze" class="step" disabled>2&nbsp;Analyze</button>
+    <button id="btnDesign"  class="step" disabled>3&nbsp;Design</button>
+    <button id="btnReport"  class="step" disabled>4&nbsp;Report</button>
+  </div>
+
+  <div class="tb-group" id="resultCtrls" style="display:none">
+    <select id="selSet" title="Load case / combination"></select>
+    <select id="selResult" title="Result type">
+      <option value="model">Model</option>
+      <option value="mesh">Mesh</option>
+      <option value="defl">Deflection Uz</option>
+      <option value="Mx">Slab Mx</option>
+      <option value="My">Slab My</option>
+      <option value="Mxy">Slab Mxy</option>
+      <option value="Vx">Slab Vx</option>
+      <option value="Vy">Slab Vy</option>
+      <option value="beamM">Beam BMD</option>
+      <option value="beamV">Beam SFD</option>
+      <option value="beamT">Beam Torsion</option>
+      <option value="react">Reactions</option>
+    </select>
+  </div>
+
+  <a href="../index.html" class="site-home" title="Back to website">← Back to website</a>
+</header>
+
+<div id="main">
+  <!-- ======================= TOOL PALETTE ======================= -->
+  <nav id="palette">
+    <button data-tool="select" class="tool active" title="Select / edit (Esc)">⬚<span>Select</span></button>
+    <button data-tool="column" class="tool" title="Place column/support">▣<span>Column</span></button>
+    <button data-tool="beam"   class="tool" title="Draw beam (click 2 points)">▬<span>Beam</span></button>
+    <button data-tool="slabRect" class="tool" title="Draw rectangular slab (2 corners)">▭<span>Slab</span></button>
+    <button data-tool="slabPoly" class="tool" title="Draw polygonal slab (click points, double-click to close)">⬠<span>Poly slab</span></button>
+    <button data-tool="opening"  class="tool" title="Draw rectangular opening">◻<span>Opening</span></button>
+    <button data-tool="pload"    class="tool" title="Apply point load">⇓<span>Pt load</span></button>
+    <hr>
+    <button id="btnZoomFit" title="Zoom to fit (F)">⤢<span>Fit</span></button>
+    <button id="btnGrid" title="Toggle snap grid" class="on">#<span>Grid</span></button>
+    <button id="btnDelete" title="Delete selection (Del)">✕<span>Delete</span></button>
+  </nav>
+
+  <!-- ======================= CANVAS ======================= -->
+  <div id="canvasWrap">
+    <canvas id="cv"></canvas>
+    <div id="legend"></div>
+    <div id="statusbar">
+      <span id="coords">x: – , y: –</span>
+      <span id="hint">Draw slabs, beams and columns. Loads &amp; properties in the right panel.</span>
+      <span id="meshInfo"></span>
+    </div>
+  </div>
+
+  <!-- ======================= RIGHT PANEL ======================= -->
+  <aside id="sidebar">
+    <div class="tabs">
+      <button class="tab active" data-tab="props">Properties</button>
+      <button class="tab" data-tab="loads">Loads</button>
+      <button class="tab" data-tab="log">Log</button>
+    </div>
+    <div id="tab-props" class="tabpage active"></div>
+    <div id="tab-loads" class="tabpage"></div>
+    <div id="tab-log" class="tabpage"><pre id="logBox"></pre></div>
+  </aside>
+</div>
+
+<input type="file" id="fileOpen" accept=".json" hidden>
+<input type="file" id="fileUnderlay" accept=".pdf,.dxf,.png,.jpg,.jpeg" hidden>
+
+<!-- ======================= SCRIPTS ======================= -->
+<script src="js/core.js"></script>
+<script src="js/model.js?v=20260704"></script>
+<script src="js/mesher.js"></script>
+<script src="js/fem.js"></script>
+<script src="js/elements.js"></script>
+<script src="js/solver.js"></script>
+<script src="js/design.js"></script>
+<script src="js/report.js"></script>
+<script src="js/underlay.js"></script>
+<script src="js/ui-canvas.js"></script>
+<script src="js/ui-results.js"></script>
+<script src="js/ui-panels.js"></script>
+<script src="js/ui-tools.js"></script>
+<script src="js/example.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Courses — Dr. Ahmed Attia M. Drar</title>
+<meta name="description" content="Digital library of course handbooks and lecture slides for civil engineering courses taught by Dr. Ahmed Attia Mahmoud Drar at Sohag University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ Base (matches main site) ============ */
+:root {
+  --navy:      #0e2238;
+  --navy-2:    #14304d;
+  --navy-3:    #1b3f63;
+  --gold:      #c9a227;
+  --gold-light:#e3c563;
+  --ink:       #22303e;
+  --muted:     #5d6b79;
+  --paper:     #f7f8fa;
+  --white:     #ffffff;
+  --line:      #e3e8ee;
+  --radius:    14px;
+  --shadow:    0 10px 30px rgba(14,34,56,.10);
+  --font-head: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, "Segoe UI", sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);color:var(--ink);background:var(--white);line-height:1.65;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+.container{width:min(1140px,92%);margin:0 auto;}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--navy);line-height:1.15;}
+
+/* ============ Nav ============ */
+.nav{
+  position:fixed;inset:0 0 auto 0;z-index:100;
+  background:rgba(14,34,56,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-head);font-size:1.15rem;font-weight:700;color:var(--white);letter-spacing:.02em;}
+.brand span{color:var(--gold-light);}
+.nav-back{
+  display:flex;align-items:center;gap:8px;
+  color:#d4dde6;font-size:.92rem;font-weight:500;
+  transition:color .2s;
+}
+.nav-back:hover{color:var(--gold-light);}
+.nav-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============ Hero / Page Header ============ */
+.page-hero{
+  padding:130px 0 70px;
+  background:linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 60%, var(--navy-3) 100%);
+  position:relative;overflow:hidden;
+}
+.page-hero::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.page-hero-inner{position:relative;}
+.page-kicker{
+  text-transform:uppercase;letter-spacing:.22em;font-size:.78rem;
+  font-weight:700;color:var(--gold);margin-bottom:14px;
+}
+.page-hero h1{
+  color:var(--white);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;margin-bottom:16px;
+}
+.page-hero h1 span{color:var(--gold-light);}
+.page-hero-sub{max-width:640px;color:#c9d5e0;font-size:1.05rem;margin-bottom:32px;}
+.page-hero-meta{
+  display:flex;flex-wrap:wrap;gap:20px;
+}
+.meta-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;padding:8px 18px;font-size:.85rem;color:#d4dde6;
+}
+.meta-pill svg{width:15px;height:15px;stroke:var(--gold-light);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============ Filter Bar ============ */
+.filter-bar{
+  background:var(--white);border-bottom:1px solid var(--line);
+  position:sticky;top:64px;z-index:90;
+  padding:16px 0;
+}
+.filter-inner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-label{font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-right:4px;}
+.filter-btn{
+  padding:7px 18px;border-radius:999px;font-size:.85rem;font-weight:600;
+  border:1.5px solid var(--line);background:transparent;color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.filter-btn:hover{border-color:var(--navy-3);color:var(--navy-3);}
+.filter-btn.active{background:var(--navy);border-color:var(--navy);color:var(--white);}
+
+/* ============ Library Body ============ */
+.library{padding:60px 0 100px;}
+
+/* ============ Course Section ============ */
+.course-section{margin-bottom:72px;}
+.course-header{
+  display:flex;align-items:flex-start;gap:20px;
+  padding-bottom:22px;margin-bottom:32px;
+  border-bottom:1px solid var(--line);
+}
+.course-icon{
+  width:52px;height:52px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-3) 100%);
+  font-size:1.5rem;
+}
+.course-title-block{}
+.course-tag{
+  display:inline-block;font-size:.73rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:6px;
+}
+.course-header h2{
+  font-size:clamp(1.3rem,2.5vw,1.75rem);color:var(--navy);margin-bottom:4px;
+}
+.course-header p{font-size:.9rem;color:var(--muted);max-width:680px;}
+
+/* ============ Resource Grid ============ */
+.resource-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:18px;
+}
+.resource-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 24px;display:flex;flex-direction:column;gap:14px;
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+  position:relative;overflow:hidden;
+}
+.resource-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(201,162,39,.4);}
+.resource-card::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--gold);border-radius:2px 0 0 2px;opacity:0;transition:opacity .25s;
+}
+.resource-card:hover::before{opacity:1;}
+
+.rc-top{display:flex;align-items:flex-start;gap:12px;}
+.rc-type-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+}
+.rc-type-icon.handbook{background:rgba(201,162,39,.12);}
+.rc-type-icon.slides  {background:rgba(14,34,56,.08);}
+.rc-type-icon.notes   {background:rgba(27,63,99,.10);}
+
+.rc-meta{}
+.rc-type-label{
+  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);margin-bottom:3px;
+}
+.rc-title{font-size:.97rem;font-weight:600;color:var(--navy);line-height:1.3;}
+
+.rc-desc{font-size:.85rem;color:var(--muted);flex:1;}
+
+.rc-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;}
+.rc-info{display:flex;align-items:center;gap:10px;}
+.rc-badge{
+  font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:999px;
+  background:var(--white);border:1px solid var(--line);color:var(--muted);
+}
+.rc-badge.new{background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.35);color:#8a6900;}
+
+.btn-download{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:999px;font-size:.82rem;font-weight:600;
+  background:var(--navy);color:var(--white);
+  transition:background .2s,transform .2s;white-space:nowrap;
+}
+.btn-download:hover{background:var(--navy-3);transform:translateY(-1px);}
+.btn-download svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+.btn-soon{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:999px;font-size:.82rem;font-weight:600;
+  border:1.5px solid var(--line);color:var(--muted);cursor:default;white-space:nowrap;
+}
+
+/* ============ Coming Soon Card ============ */
+.resource-card.coming-soon{opacity:.6;pointer-events:none;}
+.resource-card.coming-soon::before{display:none;}
+
+/* ============ Empty State ============ */
+.empty-state{
+  text-align:center;padding:80px 20px;
+  color:var(--muted);font-size:.95rem;display:none;
+}
+.empty-state svg{
+  width:48px;height:48px;stroke:var(--line);fill:none;
+  stroke-width:1.5;margin:0 auto 16px;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+
+/* ============ Stats Banner ============ */
+.stats-banner{
+  background:linear-gradient(100deg,var(--navy) 0%,var(--navy-2) 100%);
+  padding:48px 0;margin-bottom:0;
+}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;}
+.sb-num{font-family:var(--font-head);font-size:2.2rem;font-weight:700;color:var(--gold-light);line-height:1;}
+.sb-label{font-size:.82rem;color:#aebccb;margin-top:6px;}
+
+/* ============ Footer ============ */
+.page-footer{
+  background:var(--navy);border-top:1px solid rgba(255,255,255,.07);
+  padding:32px 0;text-align:center;
+  font-size:.85rem;color:#6a7f92;
+}
+.page-footer a{color:var(--gold-light);border-bottom:1px solid rgba(201,162,39,.3);padding-bottom:1px;}
+.page-footer a:hover{color:var(--white);}
+
+/* ============ Responsive ============ */
+@media(max-width:768px){
+  .resource-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:28px;}
+  .filter-inner{gap:8px;}
+  .filter-btn{padding:6px 14px;font-size:.8rem;}
+  .course-header{flex-direction:column;gap:12px;}
+}
+@media(max-width:480px){
+  .page-hero{padding:110px 0 50px;}
+  .page-hero-meta{gap:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">Ahmed&nbsp;Attia&nbsp;<span>DRAR</span></a>
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Main Site
+    </a>
+  </div>
+</header>
+
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="container page-hero-inner">
+    <p class="page-kicker">Sohag University · Faculty of Engineering · Civil Engineering Dept.</p>
+    <h1>Academic <span>Courses</span><br>Digital Library</h1>
+    <p class="page-hero-sub">Course handbooks, lecture slide decks, and supplementary notes for undergraduate and postgraduate civil engineering courses taught by Dr. Ahmed Attia Mahmoud Drar.</p>
+    <div class="page-hero-meta">
+      <span class="meta-pill">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Handbooks &amp; Slides
+      </span>
+      <span class="meta-pill">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Civil Engineering
+      </span>
+      <span class="meta-pill">
+        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        Undergraduate &amp; Postgraduate
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS BANNER ============ -->
+<div class="stats-banner">
+  <div class="container">
+    <div class="stats-row">
+      <div>
+        <div class="sb-num" id="sb-courses">0</div>
+        <div class="sb-label">Courses</div>
+      </div>
+      <div>
+        <div class="sb-num" id="sb-resources">0</div>
+        <div class="sb-label">Resources</div>
+      </div>
+      <div>
+        <div class="sb-num" id="sb-years">17</div>
+        <div class="sb-label">Years Teaching</div>
+      </div>
+      <div>
+        <div class="sb-num">PDF</div>
+        <div class="sb-label">Format</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FILTER BAR ============ -->
+<div class="filter-bar">
+  <div class="container filter-inner">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-filter="all">All Resources</button>
+    <button class="filter-btn" data-filter="handbook">📘 Handbooks</button>
+    <button class="filter-btn" data-filter="slides">📊 Slides</button>
+    <button class="filter-btn" data-filter="notes">📝 Notes</button>
+    <button class="filter-btn" data-filter="guide">💡 Guides</button>
+  </div>
+</div>
+
+<!-- ============ LIBRARY BODY ============ -->
+<main class="library">
+  <div class="container">
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      No resources match the selected filter.
+    </div>
+
+    <!-- ===== COURSE 1: Reinforced Concrete Design ===== -->
+    <div class="course-section" data-course="rc">
+      <div class="course-header">
+        <div class="course-icon">🏗️</div>
+        <div class="course-title-block">
+          <span class="course-tag">Undergraduate · Year 3 &amp; 4</span>
+          <h2>Reinforced Concrete Design</h2>
+          <p>Design of RC structural members — beams, columns, slabs, footings, and retaining walls — based on the Egyptian Code of Practice (ECP 203).</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">RC Design — Course Handbook (Part I)</div>
+            </div>
+          </div>
+          <p class="rc-desc">Fundamentals of RC theory, material properties, limit state design philosophy, and beam design for bending and shear (ECP 203).</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">ECP 203</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">RC Design — Course Handbook (Part II)</div>
+            </div>
+          </div>
+          <p class="rc-desc">Column design (short &amp; slender), combined footings, flat slabs, and staircase design with worked examples.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">ECP 203</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Chapter 1 — Introduction &amp; Materials</div>
+            </div>
+          </div>
+          <p class="rc-desc">Lecture slides covering concrete &amp; steel material behavior, stress–strain curves, and design philosophy.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">New</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Chapter 2 — Singly &amp; Doubly Reinforced Beams</div>
+            </div>
+          </div>
+          <p class="rc-desc">Flexural design of rectangular sections, T-sections, balanced and over-/under-reinforced conditions.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Chapter 3 — Shear &amp; Torsion Design</div>
+            </div>
+          </div>
+          <p class="rc-desc">Shear mechanisms, diagonal cracking, stirrup design, combined shear and torsion for beams and slabs.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 2: Structural Analysis ===== -->
+    <div class="course-section" data-course="sa">
+      <div class="course-header">
+        <div class="course-icon">📐</div>
+        <div class="course-title-block">
+          <span class="course-tag">Undergraduate · Year 2 &amp; 3</span>
+          <h2>Structural Analysis</h2>
+          <p>Analysis of statically determinate and indeterminate structures — trusses, beams, frames, and arches — using classical and matrix methods.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">Structural Analysis — Full Course Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Comprehensive handbook covering determinate structures, influence lines, force method, displacement method, and moment distribution.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Classical Methods</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Influence Lines — Theory &amp; Applications</div>
+            </div>
+          </div>
+          <p class="rc-desc">Influence lines for beams, trusses, and frames; Müller-Breslau principle; moving load analysis.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Matrix Stiffness Method</div>
+            </div>
+          </div>
+          <p class="rc-desc">Introduction to matrix structural analysis — element stiffness matrices, assembly, boundary conditions, and worked MATLAB examples.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">New</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">📝</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Notes</div>
+              <div class="rc-title">Moment Distribution Method — Worked Problems</div>
+            </div>
+          </div>
+          <p class="rc-desc">Step-by-step solved examples: multi-span beams, sway and non-sway frames, settlement and temperature effects.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 3: Finite Element Analysis ===== -->
+    <div class="course-section" data-course="fea">
+      <div class="course-header">
+        <div class="course-icon">🔢</div>
+        <div class="course-title-block">
+          <span class="course-tag">Postgraduate</span>
+          <h2>Finite Element Analysis of Structures</h2>
+          <p>Theory and application of the finite element method for structural analysis — 1D, 2D, and 3D elements, nonlinear FEA, and implementation in SAP2000 / Marc-Mentat.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">FEA of Structures — Course Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Full handbook: variational formulations, element types, mesh refinement, convergence, nonlinear and dynamic analysis.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">FEM Theory</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">2D FEA — Plane Stress &amp; Plane Strain</div>
+            </div>
+          </div>
+          <p class="rc-desc">CST and Q4 elements, numerical integration, assembly procedures — with companion FEA 2D online tool.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">New</span>
+            </div>
+            <a href="fea.html" class="btn-download" style="background:var(--gold);color:var(--navy);">
+              Open FEA 2D
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">🛡️</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook &amp; Guide</div>
+              <div class="rc-title">Calculation of Structures Safety</div>
+            </div>
+          </div>
+          <p class="rc-desc">Comprehensive handbook on structural reliability, beta index, FEA computational assurance, DEMSA protocol, and FIU bridge forensic study.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">New · Full Interactive</span>
+            </div>
+            <a href="structural-safety.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Open Handbook
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">📝</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Notes</div>
+              <div class="rc-title">Nonlinear FEA of RC Structures</div>
+            </div>
+          </div>
+          <p class="rc-desc">Material and geometric nonlinearity, concrete constitutive models, crack propagation modeling, fatigue-life prediction.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Research Level</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 4: Foundation Engineering ===== -->
+    <div class="course-section" data-course="geo">
+      <div class="course-header">
+        <div class="course-icon">🌍</div>
+        <div class="course-title-block">
+          <span class="course-tag">Undergraduate · Year 3</span>
+          <h2>Foundation Engineering</h2>
+          <p>Soil–structure interaction, bearing capacity, settlement analysis, shallow and deep foundation design per Egyptian code requirements.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">Foundation Design — Course Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Soil classification, bearing capacity theories (Terzaghi, Meyerhof, Hansen), settlement calculations, and pile foundation design.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">ECP 202</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Shallow Foundations — Bearing Capacity &amp; Settlement</div>
+            </div>
+          </div>
+          <p class="rc-desc">Spread footings, combined footings, mat foundations — bearing capacity factors, immediate and consolidation settlement.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Deep Foundations — Pile Design</div>
+            </div>
+          </div>
+          <p class="rc-desc">Driven and bored piles, group effects, negative skin friction, pile load testing, and construction methods.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 5: Steel Structures ===== -->
+    <div class="course-section" data-course="steel">
+      <div class="course-header">
+        <div class="course-icon">🔩</div>
+        <div class="course-title-block">
+          <span class="course-tag">Undergraduate · Year 4</span>
+          <h2>Steel Structures Design</h2>
+          <p>Design of steel members and connections — tension members, beams, columns, plate girders, and welded/bolted connections per ECP 205.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📘</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Handbook</div>
+              <div class="rc-title">Steel Structures — Course Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Steel member design: tension, compression, bending, combined loading, plate girders, and connection design (bolted &amp; welded).</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">ECP 205</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Plate Girder &amp; Corrugated Web Design</div>
+            </div>
+          </div>
+          <p class="rc-desc">Advanced plate girder design, flange buckling of corrugated web girders — based on Dr. Drar's published research (Eng. Structures, 2021).</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Research-Linked</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">📝</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Notes</div>
+              <div class="rc-title">Connection Design — Solved Examples</div>
+            </div>
+          </div>
+          <p class="rc-desc">Worked problems for high-strength bolted connections, fillet welds, moment-resisting connections, and base plates.</p>
+          <div class="rc-footer">
+            <div class="rc-info"></div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 6: Advanced Structural Materials ===== -->
+    <div class="course-section" data-course="mat">
+      <div class="course-header">
+        <div class="course-icon">🧱</div>
+        <div class="course-title-block">
+          <span class="course-tag">Postgraduate</span>
+          <h2>Advanced Structural Materials &amp; Strengthening</h2>
+          <p>FRP, FRCM, and NSM strengthening systems for RC structures — material characterization, design models, and case studies from cutting-edge research.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">FRP &amp; FRCM Strengthening of RC Beams</div>
+            </div>
+          </div>
+          <p class="rc-desc">Externally bonded and NSM FRP/FRCM systems — debonding failures, nonlinear FEA modeling, design guidelines. Based on published research.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Research-Linked</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Slides</div>
+              <div class="rc-title">Fatigue of RC Structures — Theory &amp; Analysis</div>
+            </div>
+          </div>
+          <p class="rc-desc">Fatigue mechanisms in RC slabs, plain-bar reinforcement, bridging stress degradation concept, and life-prediction under moving loads.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Research-Linked</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">📝</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Notes</div>
+              <div class="rc-title">Nano Silica &amp; Cementitious Composites</div>
+            </div>
+          </div>
+          <p class="rc-desc">Nano silica / magnetite core-shell additives for cement mortar — mechanical and morphological property enhancement.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Materials Science</span>
+            </div>
+            <span class="btn-soon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Coming Soon
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 7: Google Antigravity AI Guide ===== -->
+    <div class="course-section" data-course="ai">
+      <div class="course-header">
+        <div class="course-icon">🤖</div>
+        <div class="course-title-block">
+          <span class="course-tag">Special Topic · AI &amp; Engineering Automation</span>
+          <h2>Google Antigravity AI — Comprehensive Engineering Guide</h2>
+          <p>Complete documentation, system tools, slash commands, parallel sub-agent architecture, and temporal automation for civil &amp; structural engineering software workflows.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="guide">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">💡</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Interactive Guide</div>
+              <div class="rc-title">Google Antigravity AI — المرجع الهندسي الشامل</div>
+            </div>
+          </div>
+          <p class="rc-desc">Interactive Arabic guide covering system tools (run_command, view_file, write_to_file), slash commands (/goal, /schedule), and multi-agent execution.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Interactive · Arabic</span>
+            </div>
+            <a href="antigravity_arabic_guide.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Open Guide
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="guide">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">⚡</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Architecture &amp; Sub-Agents</div>
+              <div class="rc-title">Parallel Sub-Agents &amp; Automation Workflows</div>
+            </div>
+          </div>
+          <p class="rc-desc">Technical breakdown of parallel execution via invoke_subagent, define_subagent, and scheduling cron tasks for complex structural engineering computations.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Sub-Agents</span>
+            </div>
+            <a href="antigravity_arabic_guide.html#subagents-sec" class="btn-download">
+              Explore Sub-Agents
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">🛠️</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Tools &amp; Commands</div>
+              <div class="rc-title">System Tools &amp; Director Slash Commands</div>
+            </div>
+          </div>
+          <p class="rc-desc">Reference card for terminal command execution, file replacements, code search, and director slash commands (/grill-me, /browser, /learn).</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Reference</span>
+            </div>
+            <a href="antigravity_arabic_guide.html#tools-sec" class="btn-download">
+              View Tools
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 8: Calculation of Structures Safety & Mathematical Risk ===== -->
+    <div class="course-section" data-course="safety">
+      <div class="course-header">
+        <div class="course-icon">🛡️</div>
+        <div class="course-title-block">
+          <span class="course-tag">Postgraduate · Structural Reliability &amp; Risk</span>
+          <h2>Calculation of Structures Safety &amp; Mathematical Risk</h2>
+          <p>Probabilistic reliability analysis ($\beta$ index, FORM, Monte Carlo), FEA computational assurance, DEMSA material degradation protocol, and FIU bridge forensic case study.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">🛡️</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Course Handbook</div>
+              <div class="rc-title">Calculation of Structures Safety — Full Handbook Subpage</div>
+            </div>
+          </div>
+          <p class="rc-desc">Complete interactive handbook with 3-lens framework, FORM/FOSM derivations, FEA error taxonomy, DEMSA 4-step flowchart, and FIU bridge case study.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Interactive Subpage</span>
+            </div>
+            <a href="structural-safety.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Open Handbook
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Presentation Deck</div>
+              <div class="rc-title">Structural Safety &amp; Mathematical Risk — Slide Briefing</div>
+            </div>
+          </div>
+          <p class="rc-desc">11-slide briefing presentation covering deterministic vs LRFD, FORM geometry, FEA black-box paradox, Node 11/12 breakdown, and strategic imperatives.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">PDF Presentation</span>
+            </div>
+            <a href="courses/Structural_Safety_and_Mathematical_Risk.pdf" class="btn-download" download>
+              View PDF
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="notes">
+          <div class="rc-top">
+            <div class="rc-type-icon notes">📝</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Research Notes</div>
+              <div class="rc-title">DEMSA Degradation &amp; FEA Model Assurance</div>
+            </div>
+          </div>
+          <p class="rc-desc">Technical reference on 4-step DEMSA material state assessment, equivalent damage parameters, and FEA element shear locking diagnostics.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">Reference</span>
+            </div>
+            <a href="structural-safety.html#demsa-sec" class="btn-download">
+              Explore DEMSA
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== COURSE 9: Advanced Numerical Analysis (CVE721) ===== -->
+    <div class="course-section" data-course="fea">
+      <div class="course-header">
+        <div class="course-icon">💻</div>
+        <div class="course-title-block">
+          <span class="course-tag">Postgraduate · FEA &amp; Computational Mechanics</span>
+          <h2>Advanced Numerical Analysis (CVE721)</h2>
+          <p>Theoretical foundations of finite difference and variational methods, fracture-plasticity constitutive modeling, isoparametric elements, ATENA 2D nonlinear simulation, and video tutorial masterclass.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">💻</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Course Handbook Subpage</div>
+              <div class="rc-title">Advanced Numerical Analysis — Full Interactive Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Interactive course subpage detailing continuum kinematics, Rankine/Menétrey-Willam fracture-plasticity, Crack Band model, and ATENA 2D simulation.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Interactive Subpage</span>
+            </div>
+            <a href="advanced-numerical-analysis.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Open Handbook
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="slides">
+          <div class="rc-top">
+            <div class="rc-type-icon slides">📊</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Presentation Deck</div>
+              <div class="rc-title">Simulating Structural Reality with ATENA — Slide Briefing</div>
+            </div>
+          </div>
+          <p class="rc-desc">15-slide masterclass briefing covering linear vs nonlinear FEA, concrete/steel engines, crack-band regularization, and 6-step ATENA timeline.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">PDF Presentation</span>
+            </div>
+            <a href="courses/Simulating_Structural_Reality.pdf" class="btn-download" download>
+              View PDF
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📄</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Course Compilation PDF</div>
+              <div class="rc-title">CVE721 Theoretical Foundations Handbook</div>
+            </div>
+          </div>
+          <p class="rc-desc">Complete 15-page academic reference document covering continuum kinematics, bond-slip, PARDISO solvers, and Leonhardt beam validation.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">PDF Handbook</span>
+            </div>
+            <a href="courses/CVE721 Course Handbook Compilation.pdf" class="btn-download" download>
+              View PDF
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="video">
+          <div class="rc-top">
+            <div class="rc-type-icon video">🎥</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Video Masterclass</div>
+              <div class="rc-title">ATENA 2D Structural Simulation Tutorial</div>
+            </div>
+          </div>
+          <p class="rc-desc">Video tutorial demonstrating practical nonlinear finite element setup, displacement control, and post-peak crack propagation analysis.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">YouTube Tutorial</span>
+            </div>
+            <a href="https://youtu.be/tzvnVcoNpsQ" class="btn-download" target="_blank" rel="noopener">
+              Watch Video
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="page-footer">
+  <div class="container">
+    <p>
+      &copy; Dr. Ahmed Attia Mahmoud Drar — Associate Professor &amp; Consultant Structural Engineer ·
+      <a href="index.html">Back to Main Site</a> ·
+      <a href="mailto:ahmed.atya@eng.sohag.edu.eg">ahmed.atya@eng.sohag.edu.eg</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ---- Filter ---- */
+const filterBtns = document.querySelectorAll('.filter-btn');
+const cards      = document.querySelectorAll('.resource-card');
+const sections   = document.querySelectorAll('.course-section');
+const emptyState = document.getElementById('emptyState');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    let anyVisible = false;
+    sections.forEach(sec => {
+      let secHas = false;
+      sec.querySelectorAll('.resource-card').forEach(card => {
+        const show = f === 'all' || card.dataset.type === f;
+        card.style.display = show ? '' : 'none';
+        if(show) { secHas = true; anyVisible = true; }
+      });
+      sec.style.display = secHas ? '' : 'none';
+    });
+    emptyState.style.display = anyVisible ? 'none' : 'block';
+  });
+});
+
+/* ---- Stats counter ---- */
+function animateCount(el, target, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if(start >= target) { el.textContent = target; clearInterval(timer); return; }
+    el.textContent = Math.floor(start);
+  }, 16);
+}
+
+const courseCount   = document.querySelectorAll('.course-section').length;
+const resourceCount = document.querySelectorAll('.resource-card').length;
+
+const obs = new IntersectionObserver(entries => {
+  if(entries[0].isIntersecting) {
+    animateCount(document.getElementById('sb-courses'),   courseCount,   800);
+    animateCount(document.getElementById('sb-resources'), resourceCount, 900);
+    obs.disconnect();
+  }
+}, { threshold: 0.4 });
+obs.observe(document.querySelector('.stats-banner'));
+</script>
+</body>
+</html>
