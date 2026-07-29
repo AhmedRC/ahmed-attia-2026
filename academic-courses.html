@@ -296,6 +296,7 @@ h1,h2,h3,h4{font-family:var(--font-head);color:var(--navy);line-height:1.15;}
   <div class="container filter-inner">
     <span class="filter-label">Filter:</span>
     <button class="filter-btn active" data-filter="all">All Resources</button>
+    <button class="filter-btn" data-filter="app">💻 Web Apps</button>
     <button class="filter-btn" data-filter="handbook">📘 Handbooks</button>
     <button class="filter-btn" data-filter="slides">📊 Slides</button>
     <button class="filter-btn" data-filter="notes">📝 Notes</button>
@@ -324,6 +325,46 @@ h1,h2,h3,h4{font-family:var(--font-head);color:var(--navy);line-height:1.15;}
         </div>
       </div>
       <div class="resource-grid">
+
+        <div class="resource-card" data-type="app">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">⚙️</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Interactive Web App</div>
+              <div class="rc-title">RC Design Studio</div>
+            </div>
+          </div>
+          <p class="rc-desc">Full suite web application for section design, flexural and shear calculations of RC members per ECP 203, SBC 304, and ACI 318 standards.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Live Web App</span>
+            </div>
+            <a href="rc-design-studio/index.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Launch App
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="app">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">📐</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Interactive FEA App</div>
+              <div class="rc-title">RC-Floor-FEA Studio</div>
+            </div>
+          </div>
+          <p class="rc-desc">Full workflow floor slab analysis and design engine: Mesh discretization → 2D FE Plate Analysis → Steel Design → Detailed Report.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Live Web App</span>
+            </div>
+            <a href="rc-floor/index.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Launch App
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
 
         <div class="resource-card" data-type="handbook">
           <div class="rc-top">
@@ -526,6 +567,26 @@ h1,h2,h3,h4{font-family:var(--font-head);color:var(--navy);line-height:1.15;}
         </div>
       </div>
       <div class="resource-grid">
+
+        <div class="resource-card" data-type="app">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook" style="background:rgba(201,162,39,.18);">🔢</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Interactive FEA App</div>
+              <div class="rc-title">RC-FEA 2D Structural Simulator</div>
+            </div>
+          </div>
+          <p class="rc-desc">Plane-stress finite element web app with rectangular macro-elements, bar reinforcement modeling, joint/line loads, and stress contour visualizer.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge new">Live Web App</span>
+            </div>
+            <a href="rc-fea/index.html" class="btn-download" style="background:var(--gold);color:var(--navy);font-weight:700;">
+              Launch App
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
 
         <div class="resource-card" data-type="handbook">
           <div class="rc-top">
@@ -972,6 +1033,26 @@ h1,h2,h3,h4{font-family:var(--font-head);color:var(--navy);line-height:1.15;}
             <a href="structural-safety.html#demsa-sec" class="btn-download">
               Explore DEMSA
               <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="resource-card" data-type="handbook">
+          <div class="rc-top">
+            <div class="rc-type-icon handbook">📄</div>
+            <div class="rc-meta">
+              <div class="rc-type-label">Blueprint Document</div>
+              <div class="rc-title">Structural Reliability Blueprint</div>
+            </div>
+          </div>
+          <p class="rc-desc">Comprehensive reference blueprint for mathematical risk, Hasofer-Lind reliability index $\beta$, and failure probability formulation.</p>
+          <div class="rc-footer">
+            <div class="rc-info">
+              <span class="rc-badge">PDF Blueprint</span>
+            </div>
+            <a href="courses/Structural_Reliability_Blueprint-2.pdf" class="btn-download" download>
+              View PDF
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </a>
           </div>
         </div>
